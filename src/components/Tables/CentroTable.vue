@@ -40,58 +40,28 @@
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Date" width="150px" align="center">
+      <el-table-column label="Codigo" min-width="10px">
         <template slot-scope="{row}">
-          <span>{{ row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          <span>{{ row.codigo }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Title" min-width="150px">
+      <el-table-column label="Nombre" width="110px" align="center">
         <template slot-scope="{row}">
-          <span class="link-type" @click="handleUpdate(row)">{{ row.title }}</span>
-          <el-tag>{{ row.type | typeFilter }}</el-tag>
+          <span>{{ row.nombre }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Author" width="110px" align="center">
+      <el-table-column label="Direccion" width="110px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.author }}</span>
+          <span>{{ row.direccion }}</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="showReviewer" label="Reviewer" width="110px" align="center">
-        <template slot-scope="{row}">
-          <span style="color:red;">{{ row.reviewer }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Imp" width="80px">
-        <template slot-scope="{row}">
-          <svg-icon v-for="n in + row.importance" :key="n" icon-class="star" class="meta-item__icon" />
-        </template>
-      </el-table-column>
-      <el-table-column label="Readings" align="center" width="95">
-        <template slot-scope="{row}">
-          <span v-if="row.pageviews" class="link-type" @click="handleFetchPv(row.pageviews)">{{ row.pageviews }}</span>
-          <span v-else>0</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Status" class-name="status-col" width="100">
-        <template slot-scope="{row}">
-          <el-tag :type="row.status | statusFilter">
-            {{ row.status }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="Acciones" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="{row,$index}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            Edit
-          </el-button>
-          <el-button v-if="row.status!='published'" size="mini" type="success" @click="handleModifyStatus(row,'published')">
-            Publish
-          </el-button>
-          <el-button v-if="row.status!='draft'" size="mini" @click="handleModifyStatus(row,'draft')">
-            Draft
+            Actualizar
           </el-button>
           <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,$index)">
-            Delete
+            Borrar
           </el-button>
         </template>
       </el-table-column>
@@ -151,6 +121,7 @@ import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import vemecServices from '@/api/vemecServices'
 
 const calendarTypeOptions = [
   { key: 'CN', display_name: 'China' },
@@ -190,7 +161,7 @@ export default {
       listLoading: true,
       listQuery: {
         page: 1,
-        limit: 20,
+        limit: 2,
         importance: undefined,
         title: undefined,
         type: undefined,
@@ -230,18 +201,17 @@ export default {
     this.getList()
   },
   methods: {
-    getList() {
+    async getList() {
       this.listLoading = true
-      fetchList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
-        console.log(response.data.total);
-
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
-      })
+        await vemecServices.services.getCentros({
+            page: this.listQuery.page, 
+            limit: this.listQuery.limit
+            }).then( response => {
+                console.log(response.data)
+                this.list = response.data[2];
+                this.total = response.data[1];
+            }).catch(err => console.log(err));
+            this.listLoading = false;
     },
     handleFilter() {
       this.listQuery.page = 1
@@ -333,14 +303,36 @@ export default {
         }
       })
     },
-    handleDelete(row, index) {
-      this.$notify({
-        title: 'Success',
-        message: 'Delete Successfully',
-        type: 'success',
-        duration: 2000
-      })
-      this.list.splice(index, 1)
+    async handleDelete(row, index) {
+        await vemecServices.services.deleteCentro(row.id)
+        .then( response => {
+            if(response.data.status === "SUCCESS"){
+                this.$notify({
+                    title: 'Success',
+                    message: 'Se eliminó correctamente',
+                    type: 'success',
+                    duration: 3000
+                });
+                this.list.splice(index, 1)
+            }
+            else{
+                this.$notify({
+                    title: "Error",
+                    message: "Ocurrió un error al eliminar",
+                    type: "error",
+                    duration: 3000
+                });
+            }
+        }).catch(err => {
+                this.$notify({
+                title: "Error",
+                message: "Ocurrió un error al eliminar",
+                type: "error",
+                duration: 3000
+                });
+        });
+        this.listLoading = false;
+     
     },
     handleFetchPv(pv) {
       fetchPv(pv).then(response => {

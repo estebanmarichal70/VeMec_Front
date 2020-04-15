@@ -84,6 +84,19 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/centro',
+    component: Layout,
+    redirect: 'noRedirect',
+    children: [
+      {
+        path: 'centro',
+        component: () => import('@/views/centro/centro'),
+        name: 'Centro',
+        meta: { title: 'Centro', icon: 'dashboard', affix: true }
+      }
+    ]
+  },
+  {
     path: '/documentation',
     component: Layout,
     children: [

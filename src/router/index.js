@@ -84,7 +84,7 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/centro',
+    path: '/',
     component: Layout,
     redirect: 'noRedirect',
     children: [
@@ -92,7 +92,20 @@ export const constantRoutes = [
         path: 'centro',
         component: () => import('@/views/centro/centro'),
         name: 'Centro',
-        meta: { title: 'Centro', icon: 'dashboard', affix: true }
+        meta: { title: 'Centro', icon: 'international', affix: true }
+      }
+    ]
+  },
+  {
+    path: '/',
+    component: Layout,
+    redirect: 'noRedirect',
+    children: [
+      {
+        path: 'sala/:id',
+        component: () => import('@/views/sala/sala'),
+        name: 'Sala',
+        meta: { title: 'Sala', icon: 'dashboard', affix: true }
       }
     ]
   },

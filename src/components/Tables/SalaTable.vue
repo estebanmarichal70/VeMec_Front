@@ -3,19 +3,19 @@
     <div class="filter-container">
       <el-input
         v-model="listQuery.title"
-        placeholder="Nombe de Centro"
+        placeholder="Nombe de Sala"
         style="width: 200px;"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
 
-      <el-select v-model="listQuery.codigo" placeholder="Codigo" clearable class="filter-item" style="width: 130px">
+      <el-select v-model="listQuery.id" placeholder="Id" clearable class="filter-item" style="width: 130px">
         <el-option
           v-for="item in list"
           :key="item.id"
-          :label="item.codigo"
-          :value="item.codigo"
-          @click="handleFilter(item.codigo)"
+          :label="item.id"
+          :value="item.id"
+          @click="handleFilter(item.id)"
         />
       </el-select>
 
@@ -66,32 +66,21 @@
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-
-      <el-table-column label="Codigo" align="center" width="80px">
-        <template slot-scope="{row}">
-          <span>{{ row.codigo }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="Nombre" align="center" min-width="100px">
+      <el-table-column label="Nombre" align="center" width="80px">
         <template slot-scope="{row}">
           <span>{{ row.nombre }}</span>
         </template>
       </el-table-column>
-
-      <el-table-column label="Direccion" align="center">
+      <el-table-column label="Capacidad" align="center" min-width="100px">
         <template slot-scope="{row}">
-          <span>{{ row.direccion }}</span>
+          <span>{{ row.capacidad }}</span>
         </template>
       </el-table-column>
-
-      <el-table-column label="Salas" align="center">
-        <template slot-scope="{row}">
-          <router-link :to="`/sala/${row.id}`">
-            <el-button size="mini" type="success">
-              Ver Salas
-            </el-button>
-          </router-link>
+      <el-table-column label="VeMecs" align="center">
+        <template>
+          <el-button size="mini" type="success">
+            <a href="" />VeMecs
+          </el-button>
         </template>
       </el-table-column>
 
@@ -120,28 +109,17 @@
       <el-form
         ref="dataForm"
         :rules="rules"
-        :model="centro"
+        :model="sala"
         label-position="left"
         style="width: 400px; margin-left:50px;"
       >
 
         <el-form-item label="Nombre" prop="nombre">
-          <el-input v-model="centro.nombre" />
+          <el-input v-model="sala.nombre" />
         </el-form-item>
 
-        <el-form-item>
-          <el-select v-model="centro.codigo" class="filter-item" placeholder="Departamento">
-            <el-option
-              v-for="item in codigos"
-              :key="item.key"
-              :label="item.display_name"
-              :value="item.key"
-            />
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="Direccion" prop="direccion">
-          <el-input v-model="centro.direccion" />
+        <el-form-item label="Capacidad" prop="nombre">
+          <el-input v-model="sala.capacidad" />
         </el-form-item>
 
       </el-form>
@@ -159,7 +137,7 @@
 
     </el-dialog>
 
-    <el-dialog title="Estas seguro de que deseas eliminar el centro?" :visible.sync="dialogDeleteVisible">
+    <el-dialog title="Estas seguro de que deseas eliminar la sala?" :visible.sync="dialogDeleteVisible">
 
       <el-form
         ref="deleteForm"
@@ -228,7 +206,7 @@ export default {
       if (value === '') {
         callback(new Error('Please input the password again'))
       } else if (value !== this.rowToDelete.nombre) {
-        callback(new Error('Debe coincidir con el nombre del centro'))
+        callback(new Error('Debe coincidir con el nombre de la sala'))
       } else {
         callback()
       }
@@ -242,10 +220,11 @@ export default {
       listLoading: true,
       rowToDelete: null,
       indexToDelete: null,
-      centro: {
+      centroDefecto: null,
+      sala: {
         nombre: '',
-        codigo: '',
-        direccion: ''
+        capacidad: '',
+        centro: ''
       },
       deleteConfirmation: {
         nombre: ''
@@ -253,9 +232,9 @@ export default {
       listQuery: {
         page: 1,
         limit: 10,
-        codigo: null,
+        id: null,
         nombre: null,
-        direccion: null,
+        capacidad: null,
         sort: '+id'
       },
       codigos,
@@ -274,15 +253,14 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        update: 'Editar un centro',
-        create: 'Crear un nuevo centro'
+        update: 'Editar una sala',
+        create: 'Crear una nueva sala'
       },
       dialogPvVisible: false,
       pvData: [],
       rules: {
         nombre: [{ required: true, message: 'Debe ingresar un nombre', trigger: 'blur' }],
-        direccion: [{ required: true, message: 'Debe ingresar una direccion', trigger: 'blur' }],
-        codigo: [{ required: true, message: 'Debe seleccionar un departamento', trigger: 'blur' }]
+        capacidad: [{ required: true, message: 'Debe ingresar una capacidad', trigger: 'blur' }]
       },
       deleteRules: {
         nombre: [{
@@ -296,20 +274,17 @@ export default {
   computed: {
 
   },
-  created() {
-    this.getList()
+  beforeMount: function() {
+    const centroId = this.$route.params.id
+    this.getListbyId(centroId)
   },
   methods: {
-    async getList() {
+    async getListbyId(centroId) {
       this.listLoading = true
-      await vemecServices.services.getCentros({
-        page: this.listQuery.page,
-        limit: this.listQuery.limit,
-        nombre: this.listQuery.nombre,
-        codigo: this.listQuery.codigo
-      }).then(response => {
-        this.list = response.data[2]
-        this.total = response.data[1]
+      await vemecServices.services.getCentroByID(centroId
+      ).then(response => {
+        this.centroDefecto = response.data
+        this.list = this.centroDefecto.salas
       }).catch(err => console.log(err))
       this.listLoading = false
     },
@@ -355,7 +330,7 @@ export default {
       }
     },
     handleCreate() {
-      this.resetCentro()
+      this.resetSala()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -365,17 +340,17 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          const centroNuevo = {
-            nombre: this.centro.nombre,
-            codigo: this.centro.codigo,
-            direccion: this.centro.direccion
+          const salaNueva = {
+            nombre: this.sala.nombre,
+            capacidad: parseInt(this.sala.capacidad),
+            centro: parseInt(this.centroDefecto.id)
           }
-          vemecServices.services.createCentro(centroNuevo).then(res => {
+          vemecServices.services.createSala(salaNueva).then(res => {
             this.list.push(res.data)
             this.dialogFormVisible = false
             this.$notify({
               title: 'Success',
-              message: 'Se creó el centro correctamente',
+              message: 'Se creó la sala correctamente',
               type: 'success',
               duration: 3000
             })
@@ -391,10 +366,9 @@ export default {
       })
     },
     handleUpdate(row) {
-      this.centro.codigo = row.codigo
-      this.centro.direccion = row.direccion
-      this.centro.nombre = row.nombre
-      this.centro.id = row.id
+      this.sala.nombre = row.nombre
+      this.sala.capacidad = parseInt(row.capacidad)
+      this.sala.id = parseInt(row.id)
 
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
@@ -405,18 +379,22 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          vemecServices.services.updateCentro(this.centro, this.centro.id)
+          const salaModificada = {
+            nombre: this.sala.nombre,
+            capacidad: parseInt(this.sala.capacidad),
+            centro: parseInt(this.centroDefecto.id)
+          }
+          vemecServices.services.updateSala(salaModificada, this.sala.id)
             .then(response => {
               this.list.forEach((item, index) => {
                 if (item.id == response.data.id) {
-                  this.list[index].codigo = response.data.codigo
                   this.list[index].nombre = response.data.nombre
-                  this.list[index].direccion = response.data.direccion
+                  this.list[index].capacidad = response.data.capacidad
                 }
               })
               this.$notify({
                 title: 'Success',
-                message: 'Se actualizó el centro correctamente',
+                message: 'Se actualizó la sala correctamente',
                 type: 'success',
                 duration: 3000
               })
@@ -443,8 +421,9 @@ export default {
       })
     },
     async deleteData() {
-      await vemecServices.services.deleteCentro(this.rowToDelete.id)
+      await vemecServices.services.deleteSala(this.rowToDelete.id)
         .then(response => {
+          console.log(response.data.status)
           if (response.data.status === 'SUCCESS') {
             this.$notify({
               title: 'Success',
@@ -480,22 +459,21 @@ export default {
     handleDownload() {
       this.downloadLoading = true
         import('@/vendor/Export2Excel').then(excel => {
-          const tHeader = ['id', 'codigo', 'nombre', 'direccion']
-          const filterVal = ['id', 'codigo', 'nombre', 'direccion']
+          const tHeader = ['id', 'nombre', 'capacidad']
+          const filterVal = ['id', 'nombre', 'capacidad']
           const data = this.formatJson(filterVal)
           excel.export_json_to_excel({
             header: tHeader,
             data,
-            filename: 'Centros'
+            filename: 'Salas'
           })
           this.downloadLoading = false
         })
     },
-    resetCentro() {
+    resetSala() {
       this.centro = {
         nombre: '',
-        direccion: '',
-        codigo: null
+        capacidad: ''
       }
     },
     formatJson(filterVal) {

@@ -1,22 +1,11 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input
-        v-model="listQuery.title"
-        placeholder="Nombe de Centro"
-        style="width: 200px;"
-        class="filter-item"
-        @keyup.enter.native="handleFilter"
-      />
+      <el-input v-model="listQuery.nombre" placeholder="Nombre de Centro" style="width: 200px;" class="filter-item"
+                @input="handleFilter"/>
 
-      <el-select v-model="listQuery.codigo" placeholder="Codigo" clearable class="filter-item" style="width: 130px">
-        <el-option
-          v-for="item in list"
-          :key="item.id"
-          :label="item.codigo"
-          :value="item.codigo"
-          @click="handleFilter(item.codigo)"
-        />
+      <el-select @change="handleFilter()" v-model="listQuery.codigo" placeholder="Codigo" clearable class="filter-item" style="width: 130px">
+        <el-option v-for="item in list" :key="item.id" :label="item.codigo" :value="item.codigo"/>
       </el-select>
 
       <!--<el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter">
@@ -293,6 +282,9 @@ export default {
       downloadLoading: false
     }
   },
+  mounted() {
+    this.handleFilter = debounce(this.handleFilter, 300);
+  },
   computed: {
 
   },
@@ -313,15 +305,21 @@ export default {
       }).catch(err => console.log(err))
       this.listLoading = false
     },
-    /* handleFilter(codigo) {
-        this.listQuery.page = 1;
-        this.defaultList = this.list;
-        this.list.forEach((item, index) => {
-          //if(item.codigo == codigo)
-
-        });
-
-      },*/
+    async handleFilter() {
+      console.log(this.listQuery.codigo);
+      this.listQuery.page = 1;
+      this.listLoading = true;
+      await vemecServices.services.getCentros({
+        page: this.listQuery.page,
+        limit: this.listQuery.limit,
+        nombre: this.listQuery.nombre,
+        codigo: this.listQuery.codigo
+      }).then(response => {
+        console.log(response.data[2])
+        this.list = response.data[2];
+        this.listLoading = false;
+      }).catch(err => console.log(err));
+    },
     handleModifyStatus(row, status) {
       this.$message({
         message: 'Success',

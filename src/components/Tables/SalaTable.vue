@@ -66,7 +66,7 @@
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Nombre" align="center" width="80px">
+      <el-table-column label="Nombre" align="center" min-width="80px">
         <template slot-scope="{row}">
           <span>{{ row.nombre }}</span>
         </template>
@@ -77,13 +77,68 @@
         </template>
       </el-table-column>
       <el-table-column label="VeMecs" align="center">
-        <template>
-          <el-button size="mini" type="success">
-            <a href="" />VeMecs
-          </el-button>
+        <template slot-scope="{row}">
+          <el-popover
+            placement="left"
+            width="800"
+            trigger="click">
+            <el-button class="filter-item" type="success" icon="el-icon-edit" style="margin-bottom: 10px" @click="handleCreateVemec(row)">
+              Añadir VeMec
+            </el-button>
+            <el-table
+              :key="tableKey"
+              v-loading="listLoading"
+              :data="listV"
+              border
+              fit
+              highlight-current-row
+              style="width: 100%;"
+              @sort-change="sortChange"
+            >
+            <el-table-column
+              label="ID"
+              prop="id"
+              sortable="custom"
+              align="center"
+              width="80"
+              :class-name="getSortClass('id')"
+            >
+              <template slot-scope="{row}">
+                <span>{{ row.id }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="Nombre" align="center" min-width="120px">
+              <template slot-scope="{row}">
+                <span>{{ row.marca }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="Modelo" align="center" min-width="120px">
+              <template slot-scope="{row}">
+                <span>{{ row.modelo }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="Estado" align="center" min-width="100px">
+              <template slot-scope="{row}">
+                <span v-if="row.estado">Ocupado</span>
+                <span v-if="!row.estado">Desocupado</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="Acciones" align="center" width="230px">
+              <template slot-scope="{row,$index}">
+                <el-button type="primary" size="mini" @click="handleUpdateVemec(row)">
+                  Actualizar
+                </el-button>
+                <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDeleteVemec(row,$index)">
+                  Borrar
+                </el-button>
+              </template>
+          </el-table-column>
+        </el-table>
+          <el-button slot="reference" type="success" @click="getVemecs(row)" >Ver VeMecs</el-button>
+        </el-popover>
+
         </template>
       </el-table-column>
-
       <el-table-column label="Acciones" align="center" width="230px">
         <template slot-scope="{row,$index}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
@@ -105,7 +160,6 @@
     />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-
       <el-form
         ref="dataForm"
         :rules="rules"
@@ -113,7 +167,6 @@
         label-position="left"
         style="width: 400px; margin-left:50px;"
       >
-
         <el-form-item label="Nombre" prop="nombre">
           <el-input v-model="sala.nombre" />
         </el-form-item>
@@ -134,10 +187,49 @@
           Confirmar
         </el-button>
       </div>
+    </el-dialog>
+
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogVemec">
+
+      <el-form
+        ref="dataForm"
+        :rules="rules"
+        :model="vemec"
+        label-position="left"
+        style="width: 400px; margin-left:50px;"
+      >
+        <el-form-item label="Marca" prop="marca">
+          <el-input v-model="vemec.marca" />
+        </el-form-item>
+        <el-form-item label="Modelo" prop="modelo">
+          <el-input v-model="vemec.modelo" />
+        </el-form-item>
+        <el-form-item label="Estado" prop="estado">
+          <el-select v-model="vemec.estado" placeholder="Selecciona el estado">
+            <el-option
+              v-for="item in optiones"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>   
+      </el-form>
+
+      <div slot="footer" class="dialog-footer">
+
+        <el-button @click="dialogVemec = false">
+          Cancelar
+        </el-button>
+
+        <el-button type="primary" @click="dialogStatus==='create'?createDataVemec():updateDataVemec()">
+          Confirmar
+        </el-button>
+      </div>
 
     </el-dialog>
 
-    <el-dialog title="Estas seguro de que deseas eliminar la sala?" :visible.sync="dialogDeleteVisible">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogDeleteVisible">
 
       <el-form
         ref="deleteForm"
@@ -159,22 +251,11 @@
           Cancelar
         </el-button>
 
-        <el-button type="primary" @click="deleteData()">
+        <el-button type="primary" @click="dialogStatus==='sala'?deleteData():deleteDataVemec()">
           Confirmar
         </el-button>
       </div>
     </el-dialog>
-
-    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
-      <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
-        <el-table-column prop="key" label="Channel" />
-        <el-table-column prop="pv" label="Pv" />
-      </el-table>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false">Confirm</el-button>
-      </span>
-    </el-dialog>
-
   </div>
 </template>
 
@@ -213,22 +294,39 @@ export default {
     }
     return {
       dialogDeleteVisible: false,
+      dialogVemec: false,
       tempName: '',
       tableKey: 0,
       list: null,
+      listV: null,
       total: 0,
       listLoading: true,
       rowToDelete: null,
       indexToDelete: null,
       centroDefecto: null,
+      salas: null,
       sala: {
         nombre: '',
         capacidad: '',
         centro: ''
       },
+      vemec: {
+        sala: '',
+        marca: '',
+        modelo: '',
+        estado: false,
+      },
       deleteConfirmation: {
         nombre: ''
       },
+      optiones: [{
+          value: true,
+          label: 'Ocupado'
+        }, {
+          value: false,
+          label: 'Desocupado'
+        }],
+      value: false,
       listQuery: {
         page: 1,
         limit: 10,
@@ -288,6 +386,15 @@ export default {
       }).catch(err => console.log(err))
       this.listLoading = false
     },
+    async getVemecs(row) {
+      this.listLoading = true
+      await vemecServices.services.getSalaByID(row.id)
+      .then(response => {
+        this.salas = response.data
+        this.listV = this.salas.vemecs
+      }).catch(err => console.log(err))
+      this.listLoading = false
+    },
     /* handleFilter(codigo) {
         this.listQuery.page = 1;
         this.defaultList = this.list;
@@ -337,6 +444,15 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
+    handleCreateVemec(row) {
+      this.resetVemec()
+      this.vemec.sala = row.id;
+      this.dialogStatus = 'create'
+      this.dialogVemec = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
@@ -365,6 +481,35 @@ export default {
         }
       })
     },
+    createDataVemec() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          const vemecNuevo = {
+            sala: this.vemec.sala,
+            marca: this.vemec.marca,
+            modelo: this.vemec.modelo,
+            estado: this.vemec.estado
+          }
+          vemecServices.services.createVemec(vemecNuevo).then(res => {
+            this.listV.push(res.data)
+            this.dialogVemec = false
+            this.$notify({
+              title: 'Success',
+              message: 'Se creo el VeMec correctamente',
+              type: 'success',
+              duration: 3000
+            })
+          }).catch(err => {
+            this.$notify({
+              title: 'Error',
+              message: 'Ocurrió un error al crear el vemec',
+              type: 'error',
+              duration: 3000
+            })
+          })
+        }
+      })
+    },
     handleUpdate(row) {
       this.sala.nombre = row.nombre
       this.sala.capacidad = parseInt(row.capacidad)
@@ -372,6 +517,18 @@ export default {
 
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
+    handleUpdateVemec(row) {
+      this.vemec.marca = row.marca
+      this.vemec.modelo = row.modelo
+      this.vemec.id = parseInt(row.id)
+      this.vemec.estado = row.estado
+
+      this.dialogStatus = 'update'
+      this.dialogVemec = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
@@ -412,10 +569,59 @@ export default {
         }
       })
     },
+    updateDataVemec() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          const vemecModificado = {
+            marca: this.vemec.marca,
+            modelo: this.vemec.modelo,
+            estado: this.vemec.estado
+          }
+          vemecServices.services.updateVemec(vemecModificado, this.vemec.id)
+            .then(response => {
+              this.listV.forEach((item, index) => {
+                if (item.id == response.data.id) {
+                  this.listV[index].marca = response.data.marca
+                  this.listV[index].modelo = response.data.modelo
+                  this.listV[index].estadi = response.data.estado
+                }
+              })
+              this.$notify({
+                title: 'Success',
+                message: 'Se actualizó el vemec correctamente',
+                type: 'success',
+                duration: 3000
+              })
+              this.dialogVemec = false
+            }).catch(err => {
+              this.$notify({
+                title: 'Error',
+                message: 'Ocurrió un error al actualizar',
+                type: 'error',
+                duration: 3000
+              })
+              this.dialogVemec = false
+            }
+            )
+        }
+      })
+    },
     handleDelete(row, index) {
       this.rowToDelete = row
       this.indexToDelete = index
       this.dialogDeleteVisible = true
+      this.dialogStatus = 'sala'
+
+      this.$nextTick(() => {
+        this.$refs['deleteForm'].clearValidate()
+      })
+    },
+    handleDeleteVemec(row, index) {
+      this.rowToDelete = row
+      this.indexToDelete = index
+      this.dialogDeleteVisible = true
+      this.dialogStatus = 'vemec'
+
       this.$nextTick(() => {
         this.$refs['deleteForm'].clearValidate()
       })
@@ -423,7 +629,6 @@ export default {
     async deleteData() {
       await vemecServices.services.deleteSala(this.rowToDelete.id)
         .then(response => {
-          console.log(response.data.status)
           if (response.data.status === 'SUCCESS') {
             this.$notify({
               title: 'Success',
@@ -447,7 +652,40 @@ export default {
             type: 'error',
             duration: 3000
           })
+          this.dialogDeleteVisible = true
         })
+      this.dialogDeleteVisible = false
+      this.listLoading = false
+    },
+    async deleteDataVemec() {
+      await vemecServices.services.deleteVemec(this.rowToDelete.id)
+        .then(response => {
+          if (response.data.status === 'SUCCESS') {
+            this.$notify({
+              title: 'Success',
+              message: 'Se eliminó correctamente',
+              type: 'success',
+              duration: 3000
+            })
+            this.listV.splice(this.indexToDelete, 1)
+          } else {
+            this.$notify({
+              title: 'Error',
+              message: 'Ocurrió un error al eliminar',
+              type: 'error',
+              duration: 3000
+            })
+          }
+        }).catch(err => {
+          this.$notify({
+            title: 'Error',
+            message: 'Ocurrió un error al eliminar',
+            type: 'error',
+            duration: 3000
+          })
+          this.dialogDeleteVisible = true
+        })
+      this.dialogDeleteVisible = false
       this.listLoading = false
     },
     handleFetchPv(pv) {
@@ -474,6 +712,13 @@ export default {
       this.centro = {
         nombre: '',
         capacidad: ''
+      }
+    },
+    resetVemec() {
+      this.vemec = {
+        marca: '',
+        modelo: '',
+        estado: false
       }
     },
     formatJson(filterVal) {

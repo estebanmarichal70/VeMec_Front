@@ -33,6 +33,19 @@ export default {
     },
     deleteSala(id) {
       return axios.delete(apiUrl + `/sala/${id}`)
+    },
+    // Acciones Vemec
+    getVemecByID(id) {
+      return axios.get(apiUrl + `/vemec/${id}`)
+    },
+    createVemec(data) {
+      return axios.post(apiUrl + `/vemec`, data)
+    },
+    updateVemec(data, id) {
+      return axios.put(apiUrl + `/vemec/${id}`, data)
+    },
+    deleteVemec(id) {
+      return axios.delete(apiUrl + `/vemec/${id}`)
     }
   }
 }

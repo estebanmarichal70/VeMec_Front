@@ -213,9 +213,10 @@ export default {
     }
   },
   data() {
-    var validateNombre = (rule, value, callback) => {
+    let validateNombre= (rule, value, callback) =>{
+      console.log(value);
       if (value === '') {
-        callback(new Error('Please input the password again'))
+        callback(new Error('Debes ingresar algo'))
       } else if (value !== this.rowToDelete.nombre) {
         callback(new Error('Debe coincidir con el nombre del centro'))
       } else {
@@ -275,8 +276,7 @@ export default {
       },
       deleteRules: {
         nombre: [{
-          validator: validateNombre,
-          message: 'Debe ingresar un nombre', trigger: 'blur'
+          validator: validateNombre, message: 'Debe ingresar un nombre', trigger: 'blur'
         }]
       },
       downloadLoading: false
@@ -306,7 +306,6 @@ export default {
       this.listLoading = false
     },
     async handleFilter() {
-      console.log(this.listQuery.codigo);
       this.listQuery.page = 1;
       this.listLoading = true;
       await vemecServices.services.getCentros({
@@ -315,7 +314,6 @@ export default {
         nombre: this.listQuery.nombre,
         codigo: this.listQuery.codigo
       }).then(response => {
-        console.log(response.data[2])
         this.list = response.data[2];
         this.listLoading = false;
       }).catch(err => console.log(err));
@@ -427,8 +425,7 @@ export default {
                 duration: 3000
               })
               this.dialogFormVisible = false
-            }
-            )
+            })
         }
       })
     },
@@ -440,8 +437,10 @@ export default {
         this.$refs['deleteForm'].clearValidate()
       })
     },
-    async deleteData() {
-      await vemecServices.services.deleteCentro(this.rowToDelete.id)
+    deleteData() {
+      this.$refs['deleteForm'].validate((valid) => {
+        if (valid) {
+          vemecServices.services.deleteCentro(this.rowToDelete.id)
         .then(response => {
           if (response.data.status === 'SUCCESS') {
             this.$notify({
@@ -451,22 +450,26 @@ export default {
               duration: 3000
             })
             this.list.splice(this.indexToDelete, 1)
-          } else {
+            } else {
+              this.$notify({
+                title: 'Error',
+                message: 'Ocurrió un error al eliminar',
+                type: 'error',
+                duration: 3000
+              })
+            }
+          }).catch(err => {
             this.$notify({
               title: 'Error',
               message: 'Ocurrió un error al eliminar',
               type: 'error',
               duration: 3000
             })
-          }
-        }).catch(err => {
-          this.$notify({
-            title: 'Error',
-            message: 'Ocurrió un error al eliminar',
-            type: 'error',
-            duration: 3000
+            this.dialogDeleteVisible = false
           })
-        })
+        }
+      })
+      this.dialogDeleteVisible = false
       this.listLoading = false
     },
     handleFetchPv(pv) {

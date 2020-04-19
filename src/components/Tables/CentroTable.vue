@@ -89,9 +89,20 @@
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             Actualizar
           </el-button>
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,$index)">
-            Borrar
-          </el-button>
+          
+          <el-popconfirm
+            confirmButtonText='Si, eliminar'
+            confirmButtonType='danger'
+            cancelButtonText='No, cancelar'
+            cancelButtonType='success'
+            icon="el-icon-info"
+            iconColor="red"
+            @onConfirm = deleteData(row,$index)
+            title="Estas seguro que quieres eliminar?"
+          >
+            <el-button size="mini" type="danger" slot="reference">Eliminar</el-button>
+          </el-popconfirm>
+          
         </template>
       </el-table-column>
     </el-table>
@@ -119,14 +130,17 @@
         </el-form-item>
 
         <el-form-item>
-          <el-select v-model="centro.codigo" class="filter-item" placeholder="Departamento">
-            <el-option
-              v-for="item in codigos"
-              :key="item.key"
-              :label="item.display_name"
-              :value="item.key"
-            />
-          </el-select>
+          <el-form-item label="Departamento" prop="codigo">
+            <br>
+            <el-select v-model="centro.codigo" placeholder="Seleccione el departamento">
+              <el-option
+                v-for="item in codigos"
+                :key="item.key"
+                :label="item.display_name"
+                :value="item.key"
+              />
+            </el-select>
+          </el-form-item>
         </el-form-item>
 
         <el-form-item label="Direccion" prop="direccion">
@@ -145,54 +159,12 @@
           Confirmar
         </el-button>
       </div>
-
     </el-dialog>
-
-    <el-dialog title="Estas seguro de que deseas eliminar el centro?" :visible.sync="dialogDeleteVisible">
-
-      <el-form
-        ref="deleteForm"
-        :rules="deleteRules"
-        :model="deleteConfirmation"
-        label-position="left"
-        style="width: 400px; margin-left:50px;"
-      >
-
-        <el-form-item label="Nombre" prop="nombre">
-          <el-input v-model="tempName" />
-        </el-form-item>
-
-      </el-form>
-
-      <div slot="footer" class="dialog-footer">
-
-        <el-button @click="dialogDeleteVisible = false">
-          Cancelar
-        </el-button>
-
-        <el-button type="primary" @click="deleteData()">
-          Confirmar
-        </el-button>
-      </div>
-    </el-dialog>
-
-    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
-      <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
-        <el-table-column prop="key" label="Channel" />
-        <el-table-column prop="pv" label="Pv" />
-      </el-table>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false">Confirm</el-button>
-      </span>
-    </el-dialog>
-
   </div>
 </template>
 
 <script>
-import { fetchPv, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 import vemecServices from '@/api/vemecServices'
@@ -213,19 +185,7 @@ export default {
     }
   },
   data() {
-    let validateNombre= (rule, value, callback) =>{
-      console.log(value);
-      if (value === '') {
-        callback(new Error('Debes ingresar algo'))
-      } else if (value !== this.rowToDelete.nombre) {
-        callback(new Error('Debe coincidir con el nombre del centro'))
-      } else {
-        callback()
-      }
-    }
     return {
-      dialogDeleteVisible: false,
-      tempName: '',
       tableKey: 0,
       list: null,
       total: 0,
@@ -237,9 +197,6 @@ export default {
         codigo: '',
         direccion: ''
       },
-      deleteConfirmation: {
-        nombre: ''
-      },
       listQuery: {
         page: 1,
         limit: 10,
@@ -250,34 +207,17 @@ export default {
       },
       codigos,
       importanceOptions: [1, 2, 3],
-
       sortOptions: [{ label: 'Ascendente', key: '+id' }, { label: 'Descendente', key: '-id' }],
-      temp: {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
-      },
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
         update: 'Editar un centro',
         create: 'Crear un nuevo centro'
       },
-      dialogPvVisible: false,
-      pvData: [],
       rules: {
         nombre: [{ required: true, message: 'Debe ingresar un nombre', trigger: 'blur' }],
         direccion: [{ required: true, message: 'Debe ingresar una direccion', trigger: 'blur' }],
         codigo: [{ required: true, message: 'Debe seleccionar un departamento', trigger: 'blur' }]
-      },
-      deleteRules: {
-        nombre: [{
-          validator: validateNombre, message: 'Debe ingresar un nombre', trigger: 'blur'
-        }]
       },
       downloadLoading: false
     }
@@ -338,17 +278,6 @@ export default {
         this.listQuery.sort = '-id'
       }
       this.handleFilter()
-    },
-    resetTemp() {
-      this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        status: 'published',
-        type: ''
-      }
     },
     handleCreate() {
       this.resetCentro()
@@ -429,18 +358,11 @@ export default {
         }
       })
     },
-    handleDelete(row, index) {
+    async deleteData(row, index) {
+      this.listLoading = true
       this.rowToDelete = row
       this.indexToDelete = index
-      this.dialogDeleteVisible = true
-      this.$nextTick(() => {
-        this.$refs['deleteForm'].clearValidate()
-      })
-    },
-    deleteData() {
-      this.$refs['deleteForm'].validate((valid) => {
-        if (valid) {
-          vemecServices.services.deleteCentro(this.rowToDelete.id)
+      await vemecServices.services.deleteCentro(this.rowToDelete.id)
         .then(response => {
           if (response.data.status === 'SUCCESS') {
             this.$notify({
@@ -465,23 +387,14 @@ export default {
               type: 'error',
               duration: 3000
             })
-            this.dialogDeleteVisible = false
+            this.listLoading = false
           })
-        }
-      })
-      this.dialogDeleteVisible = false
       this.listLoading = false
-    },
-    handleFetchPv(pv) {
-      fetchPv(pv).then(response => {
-        this.pvData = response.data.pvData
-        this.dialogPvVisible = true
-      })
     },
     handleDownload() {
       this.downloadLoading = true
         import('@/vendor/Export2Excel').then(excel => {
-          const tHeader = ['id', 'codigo', 'nombre', 'direccion']
+          const tHeader = ['Id', 'Codigo', 'Nombre', 'Direccion']
           const filterVal = ['id', 'codigo', 'nombre', 'direccion']
           const data = this.formatJson(filterVal)
           excel.export_json_to_excel({
@@ -501,11 +414,7 @@ export default {
     },
     formatJson(filterVal) {
       return this.list.map(v => filterVal.map(j => {
-        if (j === 'timestamp') {
-          return parseTime(v[j])
-        } else {
           return v[j]
-        }
       }))
     },
     getSortClass: function(key) {

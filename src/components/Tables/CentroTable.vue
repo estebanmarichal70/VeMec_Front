@@ -115,14 +115,14 @@
       @pagination="getList"
     />
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+    <el-dialog :title="textMap[dialogStatus]" center width="40%" :visible.sync="dialogFormVisible">
 
       <el-form
         ref="dataForm"
         :rules="rules"
         :model="centro"
-        label-position="left"
-        style="width: 400px; margin-left:50px;"
+        label-position="top"
+        style="width: 80%; margin-left: 40px"
       >
 
         <el-form-item label="Nombre" prop="nombre">
@@ -131,8 +131,7 @@
 
         <el-form-item>
           <el-form-item label="Departamento" prop="codigo">
-            <br>
-            <el-select v-model="centro.codigo" placeholder="Seleccione el departamento">
+            <el-select v-model="centro.codigo" placeholder="Seleccionar">
               <el-option
                 v-for="item in codigos"
                 :key="item.key"
@@ -260,7 +259,7 @@ export default {
     },
     handleModifyStatus(row, status) {
       this.$message({
-        message: 'Success',
+        message: 'Éxito',
         type: 'success'
       })
       row.status = status
@@ -299,7 +298,7 @@ export default {
             this.list.push(res.data)
             this.dialogFormVisible = false
             this.$notify({
-              title: 'Success',
+              title: 'Éxito',
               message: 'Se creó el centro correctamente',
               type: 'success',
               duration: 3000
@@ -340,7 +339,7 @@ export default {
                 }
               })
               this.$notify({
-                title: 'Success',
+                title: 'Éxito',
                 message: 'Se actualizó el centro correctamente',
                 type: 'success',
                 duration: 3000
@@ -366,7 +365,7 @@ export default {
         .then(response => {
           if (response.data.status === 'SUCCESS') {
             this.$notify({
-              title: 'Success',
+              title: 'Éxito',
               message: 'Se eliminó correctamente',
               type: 'success',
               duration: 3000

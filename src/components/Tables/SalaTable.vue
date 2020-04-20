@@ -102,7 +102,7 @@
       </el-table-column>
     </el-table>
 
-    <el-dialog title="Lista de VeMecs" align="center" :visible.sync="dialogMainVemec">
+    <el-dialog title="Lista de VeMecs" align="center" width="70%" :visible.sync="dialogMainVemec">
         <el-button class="filter-item" type="primary" icon="el-icon-edit" style="margin-bottom: 10px" @click="handleCreateVemec">
           Añadir
         </el-button>
@@ -187,13 +187,13 @@
       @pagination="getList"
     />
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+    <el-dialog :title="textMap[dialogStatus]" center width="40%" :visible.sync="dialogFormVisible">
       <el-form
         ref="dataForm"
         :rules="rules"
         :model="sala"
-        label-position="left"
-        style="width: 400px; margin-left:50px;"
+        label-position="top"
+        style="width: 80%; margin-left: 40px"
       >
         <el-form-item label="Nombre" prop="nombre">
           <el-input v-model="sala.nombre" />
@@ -212,13 +212,13 @@
       </div>
     </el-dialog>
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogVemec">
+    <el-dialog :title="textMap[dialogStatus]" center  width="40%" :visible.sync="dialogVemec">
       <el-form
         ref="dataForm"
         :rules="rulesV"
         :model="vemec"
-        label-position="left"
-        style="width: 300px; margin-left:50px;"
+        label-position="top"
+        style="width: 80%; margin-left: 40px"
       >
         <el-form-item label="Marca" prop="marca">
           <el-input v-model="vemec.marca" />
@@ -227,7 +227,6 @@
           <el-input v-model="vemec.modelo" />
         </el-form-item>
         <el-form-item label="Estado" prop="estado">
-          <br>
           <el-select v-model="vemec.estado" placeholder="Seleccione el estado">
             <el-option
               v-for="item in opciones"
@@ -326,11 +325,13 @@ export default {
         createV: 'Crear una nuevo VeMec'
       },
       rules: {
-        nombre: [{ required: true, message: 'Debe ingresar el nombre de la sala', trigger: 'blur' }]
+        nombre: [{ required: true, message: 'Debe ingresar el nombre de la sala', trigger: 'blur' }],
+        capacidad: [{ required: true, message: 'Debe ingresar una capacidad valida', trigger: 'blur' }]
       },
       rulesV: {
         marca: [{ required: true, message: 'Debe ingresar una marca', trigger: 'blur' }],
-        modelo: [{ required: true, message: 'Debe ingresar un modelo', trigger: 'blur' }]
+        modelo: [{ required: true, message: 'Debe ingresar un modelo', trigger: 'blur' }],
+        estado: [{ required: true, message: 'Debe ingresar un estado', trigger: 'blur' }]
       },
       downloadLoading: false
     }
@@ -544,7 +545,7 @@ export default {
               })
               this.$notify({
                 title: 'Éxito',
-                message: 'Se actualizó el vemec correctamente',
+                message: 'Se actualizó el VeMec correctamente',
                 type: 'success',
                 duration: 3000
               })

@@ -58,7 +58,7 @@
 
       <el-table-column label="Informacion" align="center">
         <template slot-scope="{row}">
-          <router-link :to="`/paciente/${row.id}`">
+          <router-link :to="`/perfil/${row.id}`">
             <el-button size="mini" type="success">
               Ver Informacion
             </el-button>
@@ -244,7 +244,6 @@ export default {
       }).then(response => {
         this.list = response.data[2]
         this.total = response.data[1]
-        console.log(response.data[2]);
       }).catch(err => console.log(err))
       this.listLoading = false
     },

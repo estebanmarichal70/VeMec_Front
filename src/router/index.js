@@ -84,12 +84,12 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/',
+    path: '/centro',
     component: Layout,
     redirect: 'noRedirect',
     children: [
       {
-        path: 'centro',
+        path: '/centro',
         component: () => import('@/views/centro/centro'),
         name: 'Centro',
         meta: { title: 'Centros', icon: 'international', affix: true }
@@ -97,24 +97,24 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/',
+    path: '/sala',
     component: Layout,
     redirect: 'noRedirect',
     children: [
       {
-        path: 'sala/:id',
+        path: '/sala/:id',
         component: () => import('@/views/sala/sala'),
         name: 'Sala'
       }
     ]
   },
   {
-    path: '/',
+    path: '/paciente',
     component: Layout,
     redirect: 'noRedirect',
     children: [
       {
-        path: 'paciente',
+        path: '/paciente',
         component: () => import('@/views/paciente/paciente'),
         name: 'Paciente',
         meta: { title: 'Pacientes', icon: 'dashboard', affix: true }
@@ -122,12 +122,12 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/',
+    path: '/paciente',
     component: Layout,
     redirect: 'noRedirect',
     children: [
       {
-        path: 'paciente/:id',
+        path: '/perfil/:id',
         component: () => import('@/views/perfilPaciente/index'),
         name: 'Paciente',
       }

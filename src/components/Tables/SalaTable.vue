@@ -257,7 +257,6 @@ export default {
       listLoading: true,
       rowToDelete: null,
       indexToDelete: null,
-      centroDefecto: null,
       sala: {
         nombre: '',
         capacidad: '',
@@ -330,15 +329,12 @@ export default {
     },
     async getList() {
       this.listLoading = true
-      console.log(this.listQuery.nombre)
-      console.log(this.listQuery.centro)
       await vemecServices.services.getSalas({
         page: this.listQuery.page,
         limit: this.listQuery.limit,
         nombre: this.listQuery.nombre,
         centro: this.listQuery.centro
       }).then(response => {
-        console.log(response.data)
         this.list = response.data[2]
         this.total = response.data[1]
       }).catch(err => console.log(err))
@@ -392,7 +388,7 @@ export default {
           const salaNueva = {
             nombre: this.sala.nombre,
             capacidad: parseInt(this.sala.capacidad),
-            centro: parseInt(this.centroDefecto.id)
+            centro: parseInt(this.listQuery.centro)
           }
           vemecServices.services.createSala(salaNueva).then(res => {
             this.list.push(res.data)
@@ -473,7 +469,7 @@ export default {
           const salaModificada = {
             nombre: this.sala.nombre,
             capacidad: parseInt(this.sala.capacidad),
-            centro: parseInt(this.centroDefecto.id)
+            centro: parseInt(this.listQuery.centro)
           }
           vemecServices.services.updateSala(salaModificada, this.sala.id)
             .then(response => {

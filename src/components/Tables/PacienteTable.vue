@@ -3,10 +3,6 @@
     <div class="filter-container">
       <el-input v-model="listQuery.nombre" placeholder="Nombre del Paciente" style="width: 250px;" class="filter-item"
                 @input="handleFilter"/>
-
-      <el-select @change="handleFilter()" v-model="listQuery.id" placeholder="Codigo" clearable class="filter-item" style="width: 130px">
-        <el-option v-for="item in codigos" :key="item.key" :label="item.key" :value="item.key"/>
-      </el-select>
       
       <el-button class="filter-item" type="primary" icon="el-icon-edit" @click="handleCreate">
         Añadir
@@ -62,7 +58,7 @@
 
       <el-table-column label="Informacion" align="center">
         <template slot-scope="{row}">
-          <router-link :to="`/sala/${row.id}`">
+          <router-link :to="`/paciente/${row.id}`">
             <el-button size="mini" type="success">
               Ver Informacion
             </el-button>

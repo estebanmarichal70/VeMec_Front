@@ -110,6 +110,19 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/',
+    component: Layout,
+    redirect: 'noRedirect',
+    children: [
+      {
+        path: 'paciente',
+        component: () => import('@/views/paciente/paciente'),
+        name: 'Paciente',
+        meta: { title: 'Pacientes', icon: 'dashboard', affix: true }
+      }
+    ]
+  },
+  {
     path: '/documentation',
     component: Layout,
     children: [

@@ -49,6 +49,22 @@ export default {
     },
     deleteVemec(id) {
       return axios.delete(apiUrl + `/vemec/${id}`)
+    },
+    // Acciones Pacientes
+    getPacientes({ page, limit, nombre, apellido }) {
+      return axios.get(apiUrl + `/paciente?page=${page}&limit=${limit}&nombre=${nombre}&apellido=${apellido}`)
+    },
+    getPacienteByID(id) {
+      return axios.get(apiUrl + `/paciente/${id}`)
+    },
+    createPaciente(data) {
+      return axios.post(apiUrl + `/paciente`, data)
+    },
+    updatePaciente(data, id) {
+      return axios.put(apiUrl + `/paciente/${id}`, data)
+    },
+    deletePaciente(id) {
+      return axios.delete(apiUrl + `/paciente/${id}`)
     }
   }
 }

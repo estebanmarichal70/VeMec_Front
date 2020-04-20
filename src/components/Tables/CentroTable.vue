@@ -1,11 +1,11 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.nombre" placeholder="Nombre de Centro" style="width: 200px;" class="filter-item"
+      <el-input v-model="listQuery.nombre" placeholder="Nombre de Centro" style="width: 250px;" class="filter-item"
                 @input="handleFilter"/>
 
       <el-select @change="handleFilter()" v-model="listQuery.codigo" placeholder="Codigo" clearable class="filter-item" style="width: 130px">
-        <el-option v-for="item in list" :key="item.id" :label="item.codigo" :value="item.codigo"/>
+        <el-option v-for="item in codigos" :key="item.key" :label="item.key" :value="item.key"/>
       </el-select>
 
       <!--<el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter">
@@ -107,13 +107,7 @@
       </el-table-column>
     </el-table>
 
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="listQuery.page"
-      :limit.sync="listQuery.limit"
-      @pagination="getList"
-    />
+    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <el-dialog :title="textMap[dialogStatus]" center width="40%" :visible.sync="dialogFormVisible">
 
@@ -166,6 +160,7 @@
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
+import debounce from 'lodash.debounce'
 import vemecServices from '@/api/vemecServices'
 import codigos from '@/constants/codigos'
 
@@ -246,16 +241,7 @@ export default {
     },
     async handleFilter() {
       this.listQuery.page = 1;
-      this.listLoading = true;
-      await vemecServices.services.getCentros({
-        page: this.listQuery.page,
-        limit: this.listQuery.limit,
-        nombre: this.listQuery.nombre,
-        codigo: this.listQuery.codigo
-      }).then(response => {
-        this.list = response.data[2];
-        this.listLoading = false;
-      }).catch(err => console.log(err));
+      this.getList();
     },
     handleModifyStatus(row, status) {
       this.$message({
@@ -297,6 +283,7 @@ export default {
           vemecServices.services.createCentro(centroNuevo).then(res => {
             this.list.push(res.data)
             this.dialogFormVisible = false
+            this.total++
             this.$notify({
               title: 'Éxito',
               message: 'Se creó el centro correctamente',
@@ -364,6 +351,7 @@ export default {
       await vemecServices.services.deleteCentro(this.rowToDelete.id)
         .then(response => {
           if (response.data.status === 'SUCCESS') {
+            this.total--
             this.$notify({
               title: 'Éxito',
               message: 'Se eliminó correctamente',

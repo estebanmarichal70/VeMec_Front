@@ -25,6 +25,9 @@ export default {
     getSalaByID(id) {
       return axios.get(apiUrl + `/sala/${id}`)
     },
+    getSalas({ page, limit, nombre, centro }) {
+      return axios.get(apiUrl + `/sala?page=${page}&limit=${limit}&nombre=${nombre}&centro=${centro}`)
+    },
     createSala(data) {
       return axios.post(apiUrl + `/sala`, data)
     },

@@ -1,31 +1,8 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input
-        v-model="listQuery.title"
-        placeholder="Nombe de Sala"
-        style="width: 200px;"
-        class="filter-item"
-        @keyup.enter.native="handleFilter"
-      />
-
-      <el-select v-model="listQuery.id" placeholder="Id" clearable class="filter-item" style="width: 130px">
-        <el-option
-          v-for="item in list"
-          :key="item.id"
-          :label="item.id"
-          :value="item.id"
-          @click="handleFilter(item.id)"
-        />
-      </el-select>
-
-      <!--<el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter">
-        <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
-      </el-select>-->
-
-      <!--<el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
-        Buscar
-      </el-button>-->
+      <el-input v-model="listQuery.nombre" placeholder="Nombre de Sala" style="width: 200px;" class="filter-item"
+                @input="handleFilter"/>
 
       <el-button class="filter-item" type="primary" icon="el-icon-edit" @click="handleCreate">
         Añadir
@@ -101,6 +78,8 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList()" />
 
     <el-dialog title="Lista de VeMecs" align="center" width="70%" :visible.sync="dialogMainVemec">
         <el-button class="filter-item" type="primary" icon="el-icon-edit" style="margin-bottom: 10px" @click="handleCreateVemec">
@@ -179,14 +158,6 @@
       </div>
     </el-dialog>
 
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="listQuery.page"
-      :limit.sync="listQuery.limit"
-      @pagination="getList"
-    />
-
     <el-dialog :title="textMap[dialogStatus]" center width="40%" :visible.sync="dialogFormVisible">
       <el-form
         ref="dataForm"
@@ -255,6 +226,7 @@
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
+import debounce from 'lodash.debounce'
 import vemecServices from '@/api/vemecServices'
 
 export default {
@@ -279,7 +251,7 @@ export default {
       tableKey: 0,
       list: null,
       listV: null,
-      salaID: '',
+      salaId: '',
       salas: null,
       total: 0,
       listLoading: true,
@@ -308,9 +280,8 @@ export default {
       listQuery: {
         page: 1,
         limit: 10,
-        id: null,
+        centro: null,
         nombre: null,
-        capacidad: null,
         sort: '+id'
       },
       importanceOptions: [1, 2, 3],
@@ -339,22 +310,16 @@ export default {
   computed: {
 
   },
+  mounted(){
+    this.handleFilter = debounce(this.handleFilter, 300);
+  },
   beforeMount: function() {
-    const centroId = this.$route.params.id
-    this.getListbyId(centroId)
+    this.listQuery.centro = this.$route.params.id
+    this.getList()
   },
   methods: {
-    async getListbyId(centroId) {
-      this.listLoading = true
-      await vemecServices.services.getCentroByID(centroId
-      ).then(response => {
-        this.centroDefecto = response.data
-        this.list = this.centroDefecto.salas
-      }).catch(err => console.log(err))
-      this.listLoading = false
-    },
     async getVemecs(row) {
-      this.salaID = row.id
+      this.salaId = row.id
       this.listLoading = true
       await vemecServices.services.getSalaByID(row.id)
       .then(response => {
@@ -363,15 +328,26 @@ export default {
       }).catch(err => console.log(err))
       this.listLoading = false
     },
-    /* handleFilter(codigo) {
-        this.listQuery.page = 1;
-        this.defaultList = this.list;
-        this.list.forEach((item, index) => {
-          //if(item.codigo == codigo)
-
-        });
-
-      },*/
+    async getList() {
+      this.listLoading = true
+      console.log(this.listQuery.nombre)
+      console.log(this.listQuery.centro)
+      await vemecServices.services.getSalas({
+        page: this.listQuery.page,
+        limit: this.listQuery.limit,
+        nombre: this.listQuery.nombre,
+        centro: this.listQuery.centro
+      }).then(response => {
+        console.log(response.data)
+        this.list = response.data[2]
+        this.total = response.data[1]
+      }).catch(err => console.log(err))
+      this.listLoading = false
+    },
+    async handleFilter() {
+      this.listQuery.page = 1;
+      this.getList()
+    },
     handleModifyStatus(row, status) {
       this.$message({
         message: 'Éxito',
@@ -403,7 +379,7 @@ export default {
     },
     handleCreateVemec() {
       this.resetVemec()
-      this.vemec.sala = this.salaID;
+      this.vemec.sala = this.salaId;
       this.dialogStatus = 'createV'
       this.dialogVemec = true
       this.$nextTick(() => {
@@ -421,6 +397,7 @@ export default {
           vemecServices.services.createSala(salaNueva).then(res => {
             this.list.push(res.data)
             this.dialogFormVisible = false
+            this.total++
             this.$notify({
               title: 'Éxito',
               message: 'Se creó la sala correctamente',
@@ -570,6 +547,7 @@ export default {
       await vemecServices.services.deleteSala(this.rowToDelete.id)
         .then(response => {
           if (response.data.status === 'SUCCESS') {
+            this.total--
             this.$notify({
               title: 'Éxito',
               message: 'Se eliminó correctamente',

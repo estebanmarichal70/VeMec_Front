@@ -86,10 +86,4 @@ let sobrecargaReporte = () => {
 
 
 
-sobrecargaCentros();
-sobrecargaSalas();
-sobrecargaVemecs();
-sobrecargaPacientes();
-sobrecargaIngresos();
 sobrecargaReporte();
-sobrecargaIngresos();

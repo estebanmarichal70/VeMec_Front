@@ -4,6 +4,10 @@ const apiUrl = baseUrl + basePath
 
 import axios from 'axios'
 
+let addDefaultHeaders = () => {
+  axios.defaults.headers.common['Authorization'] = JSON.parse(localStorage.getItem('access-token'));
+}
+
 export default {
   services: {
     getCentros({ page, limit, codigo, nombre }) {

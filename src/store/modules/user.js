@@ -13,6 +13,7 @@ const state = {
 const mutations = {
   SET_TOKEN: (state, token) => {
     state.token = token
+    localStorage.setItem("token", JSON.stringify(token));
   },
   SET_INTRODUCTION: (state, introduction) => {
     state.introduction = introduction

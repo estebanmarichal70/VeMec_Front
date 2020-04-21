@@ -84,28 +84,52 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/',
+    path: '/centro',
     component: Layout,
     redirect: 'noRedirect',
     children: [
       {
-        path: 'centro',
+        path: '/centro',
         component: () => import('@/views/centro/centro'),
         name: 'Centro',
-        meta: { title: 'Centro', icon: 'international', affix: true }
+        meta: { title: 'Centros', icon: 'international', affix: true }
       }
     ]
   },
   {
-    path: '/',
+    path: '/sala',
     component: Layout,
     redirect: 'noRedirect',
     children: [
       {
-        path: 'sala/:id',
+        path: '/sala/:id',
         component: () => import('@/views/sala/sala'),
-        name: 'Sala',
-        meta: { title: 'Sala', icon: 'dashboard', affix: true }
+        name: 'Sala'
+      }
+    ]
+  },
+  {
+    path: '/paciente',
+    component: Layout,
+    redirect: 'noRedirect',
+    children: [
+      {
+        path: '/paciente',
+        component: () => import('@/views/paciente/paciente'),
+        name: 'Paciente',
+        meta: { title: 'Pacientes', icon: 'dashboard', affix: true }
+      }
+    ]
+  },
+  {
+    path: '/paciente',
+    component: Layout,
+    redirect: 'noRedirect',
+    children: [
+      {
+        path: '/perfil/:id',
+        component: () => import('@/views/perfilPaciente/index'),
+        name: 'Paciente',
       }
     ]
   },
@@ -134,7 +158,7 @@ export const constantRoutes = [
       }
     ]
   },
-  {
+  /*{
     path: '/profile',
     component: Layout,
     redirect: '/profile/index',
@@ -147,7 +171,7 @@ export const constantRoutes = [
         meta: { title: 'Profile', icon: 'user', noCache: true }
       }
     ]
-  }
+  }*/
 ]
 
 /**

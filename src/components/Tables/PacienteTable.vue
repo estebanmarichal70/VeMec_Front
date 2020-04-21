@@ -1,12 +1,8 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.nombre" placeholder="Nombre de Centro" style="width: 250px;" class="filter-item"
+      <el-input v-model="listQuery.nombre" placeholder="Nombre del Paciente" style="width: 250px;" class="filter-item"
                 @input="handleFilter"/>
-
-      <el-select @change="handleFilter()" v-model="listQuery.codigo" placeholder="Codigo" clearable class="filter-item" style="width: 130px">
-        <el-option v-for="item in codigos" :key="item.key" :label="item.key" :value="item.key"/>
-      </el-select>
       
       <el-button class="filter-item" type="primary" icon="el-icon-edit" @click="handleCreate">
         Añadir
@@ -35,22 +31,10 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-      <el-table-column
-        label="ID"
-        prop="id"
-        sortable="custom"
-        align="center"
-        width="80"
-        :class-name="getSortClass('id')"
-      >
+
+      <el-table-column label="Cedula" align="center" width="100px">
         <template slot-scope="{row}">
           <span>{{ row.id }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="Codigo" align="center" width="80px">
-        <template slot-scope="{row}">
-          <span>{{ row.codigo }}</span>
         </template>
       </el-table-column>
 
@@ -60,17 +44,23 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Direccion" align="center">
+      <el-table-column label="Apellido" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.direccion }}</span>
+          <span>{{ row.apellido }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Salas" align="center">
+      <el-table-column label="Edad" align="center">
         <template slot-scope="{row}">
-          <router-link :to="`/sala/${row.id}`">
+          <span>{{ row.edad }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="Informacion" align="center">
+        <template slot-scope="{row}">
+          <router-link :to="`/perfil/${row.id}`">
             <el-button size="mini" type="success">
-              Ver Salas
+              Ver Informacion
             </el-button>
           </router-link>
         </template>
@@ -106,30 +96,46 @@
       <el-form
         ref="dataForm"
         :rules="rules"
-        :model="centro"
+        :model="paciente"
         label-position="top"
         style="width: 80%; margin-left: 40px"
       >
 
+        <el-form-item label="Cedula" prop="id">
+          <el-input v-model="paciente.id" />
+        </el-form-item>
+
         <el-form-item label="Nombre" prop="nombre">
-          <el-input v-model="centro.nombre" />
+          <el-input v-model="paciente.nombre" />
         </el-form-item>
 
-        <el-form-item>
-          <el-form-item label="Departamento" prop="codigo">
-            <el-select v-model="centro.codigo" placeholder="Seleccionar">
-              <el-option
-                v-for="item in codigos"
-                :key="item.key"
-                :label="item.display_name"
-                :value="item.key"
-              />
-            </el-select>
-          </el-form-item>
+        <el-form-item label="Apellido" prop="apellido">
+          <el-input v-model="paciente.apellido" />
         </el-form-item>
 
-        <el-form-item label="Direccion" prop="direccion">
-          <el-input v-model="centro.direccion" />
+        <el-form-item label="Edad" prop="edad">
+          <el-input v-model="paciente.edad" />
+        </el-form-item>
+
+        <el-form-item label="Patologias">
+            <el-tag
+            :key="tag"
+            v-for="tag in paciente.patologias"
+            closable
+            :disable-transitions="false"
+            @close="handleClose(tag)">
+            {{tag}}
+        </el-tag>
+        <el-input
+            class="input-new-tag"
+            v-if="inputVisible"
+            v-model="inputValue"
+            ref="saveTagInput"
+            size="mini"
+            @keyup.enter.native="handleInputConfirm"
+            @blur="handleInputConfirm">
+        </el-input>
+        <el-button v-else class="button-new-tag" size="small" @click="showInput">+ Nueva patologia</el-button>
         </el-form-item>
 
       </el-form>
@@ -178,17 +184,25 @@ export default {
       listLoading: true,
       rowToDelete: null,
       indexToDelete: null,
-      centro: {
+      paciente: {
+        id: '',
         nombre: '',
-        codigo: '',
-        direccion: ''
+        apellido: '',
+        edad:'',
+        patologias:[]
       },
+      //datos para tags de patologias
+      dynamicTags: [],
+      inputVisible: false,
+      inputValue: '',
+    //
       listQuery: {
         page: 1,
         limit: 10,
-        codigo: null,
+        id: null,
         nombre: null,
-        direccion: null,
+        apellido: null,
+        edad: null,
         sort: '+id'
       },
       codigos,
@@ -197,13 +211,14 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        update: 'Editar un centro',
-        create: 'Crear un nuevo centro'
+        update: 'Editar un paciente',
+        create: 'Crear un nuevo paciente'
       },
       rules: {
+        id: [{ required: true, message: 'Debe ingresar una cedula', trigger: 'blur' }],
         nombre: [{ required: true, message: 'Debe ingresar un nombre', trigger: 'blur' }],
-        direccion: [{ required: true, message: 'Debe ingresar una direccion', trigger: 'blur' }],
-        codigo: [{ required: true, message: 'Debe seleccionar un departamento', trigger: 'blur' }]
+        apellido: [{ required: true, message: 'Debe ingresar un apellido', trigger: 'blur' }],
+        edad: [{ required: true, message: 'Debe ingresar un edad', trigger: 'blur' }],
       },
       downloadLoading: false
     }
@@ -220,11 +235,12 @@ export default {
   methods: {
     async getList() {
       this.listLoading = true
-      await vemecServices.services.getCentros({
+      await vemecServices.services.getPacientes({
         page: this.listQuery.page,
         limit: this.listQuery.limit,
         nombre: this.listQuery.nombre,
-        codigo: this.listQuery.codigo
+        apellido: this.listQuery.apellido,
+        edad: this.listQuery.edad
       }).then(response => {
         this.list = response.data[2]
         this.total = response.data[1]
@@ -257,7 +273,7 @@ export default {
       this.handleFilter()
     },
     handleCreate() {
-      this.resetCentro()
+      this.resetPaciente()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -267,18 +283,20 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          const centroNuevo = {
-            nombre: this.centro.nombre,
-            codigo: this.centro.codigo,
-            direccion: this.centro.direccion
-          }
-          vemecServices.services.createCentro(centroNuevo).then(res => {
+            const pacienteNuevo = {
+                id: parseInt(this.paciente.id),
+                nombre: this.paciente.nombre,
+                apellido: this.paciente.apellido,
+                edad: parseInt(this.paciente.edad),
+                patologias: this.paciente.patologias
+            }
+          vemecServices.services.createPaciente(pacienteNuevo).then(res => {
             this.list.push(res.data)
             this.dialogFormVisible = false
             this.total++
             this.$notify({
               title: 'Éxito',
-              message: 'Se creó el centro correctamente',
+              message: 'Se creó el paciente correctamente',
               type: 'success',
               duration: 3000
             })
@@ -294,10 +312,10 @@ export default {
       })
     },
     handleUpdate(row) {
-      this.centro.codigo = row.codigo
-      this.centro.direccion = row.direccion
-      this.centro.nombre = row.nombre
-      this.centro.id = row.id
+      this.paciente.id = parseInt(row.id)
+      this.paciente.nombre = row.nombre
+      this.paciente.apellido = row.apellido
+      this.paciente.edad = parseInt(row.edad)
 
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
@@ -308,18 +326,25 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          vemecServices.services.updateCentro(this.centro, this.centro.id)
+            const pacienteModificado = {
+            id: parseInt(this.paciente.id),
+            nombre: this.paciente.nombre,
+            apellido: this.paciente.apellido,
+            edad: parseInt(this.paciente.edad)
+          }
+          vemecServices.services.updatePaciente(pacienteModificado, this.paciente.id)
             .then(response => {
               this.list.forEach((item, index) => {
                 if (item.id == response.data.id) {
-                  this.list[index].codigo = response.data.codigo
+                  this.list[index].id = response.data.id
                   this.list[index].nombre = response.data.nombre
-                  this.list[index].direccion = response.data.direccion
+                  this.list[index].apellido = response.data.apellido
+                  this.list[index].edad = response.data.edad
                 }
               })
               this.$notify({
                 title: 'Éxito',
-                message: 'Se actualizó el centro correctamente',
+                message: 'Se actualizó el paciente correctamente',
                 type: 'success',
                 duration: 3000
               })
@@ -340,7 +365,7 @@ export default {
       this.listLoading = true
       this.rowToDelete = row
       this.indexToDelete = index
-      await vemecServices.services.deleteCentro(this.rowToDelete.id)
+      await vemecServices.services.deletePaciente(this.rowToDelete.id)
         .then(response => {
           if (response.data.status === 'SUCCESS') {
             this.total--
@@ -373,22 +398,24 @@ export default {
     handleDownload() {
       this.downloadLoading = true
         import('@/vendor/Export2Excel').then(excel => {
-          const tHeader = ['Id', 'Codigo', 'Nombre', 'Direccion']
-          const filterVal = ['id', 'codigo', 'nombre', 'direccion']
+          const tHeader = ['Cedula', 'Nombre', 'Apellido', 'Edad']
+          const filterVal = ['cedula', 'nombre', 'apellido', 'edad']
           const data = this.formatJson(filterVal)
           excel.export_json_to_excel({
             header: tHeader,
             data,
-            filename: 'Centros'
+            filename: 'Pacientes'
           })
           this.downloadLoading = false
         })
     },
-    resetCentro() {
-      this.centro = {
+    resetPaciente() {
+      this.paciente = {
+        id: null,
         nombre: '',
-        direccion: '',
-        codigo: null
+        apellido: '',
+        edad: null,
+        patologias: []
       }
     },
     formatJson(filterVal) {
@@ -399,7 +426,43 @@ export default {
     getSortClass: function(key) {
       const sort = this.listQuery.sort
       return sort === `+${key}` ? 'ascending' : 'descending'
-    }
+    },
+
+    handleClose(tag) {
+        this.paciente.patologias.splice(this.paciente.patologias.indexOf(tag), 1);
+    },
+    showInput() {
+        this.inputVisible = true;
+        this.$nextTick(_ => {
+          this.$refs.saveTagInput.$refs.input.focus();
+        });
+      },
+      handleInputConfirm() {
+        let inputValue = this.inputValue;
+        if (inputValue) {
+          this.paciente.patologias.push(inputValue);
+        }
+        this.inputVisible = false;
+        this.inputValue = '';
+      }
   }
 }
 </script>
+
+<style>
+  .el-tag + .el-tag {
+    margin-left: 10px;
+  }
+  .button-new-tag {
+    margin-left: 10px;
+    height: 32px;
+    line-height: 30px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .input-new-tag {
+    width: 90px;
+    margin-left: 10px;
+    vertical-align: bottom;
+  }
+</style>

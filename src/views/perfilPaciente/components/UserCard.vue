@@ -1,14 +1,14 @@
 <template>
   <el-card style="margin-bottom:20px;">
     <div slot="header" class="clearfix">
-      <span>About me</span>
+      <span>{{paciente.nombre}}</span>
     </div>
 
     <div class="user-profile">
       <div class="box-center">
         <pan-thumb :image="user.avatar" :height="'100px'" :width="'100px'" :hoverable="false">
-          <div>Hello</div>
-          {{ user.role }}
+          <div>Hola</div>
+          {{ paciente.nombre }}
         </pan-thumb>
       </div>
       <div class="box-center">
@@ -19,32 +19,23 @@
 
     <div class="user-bio">
       <div class="user-education user-bio-section">
-        <div class="user-bio-section-header"><svg-icon icon-class="education" /><span>Education</span></div>
+        <div class="user-bio-section-header"><svg-icon icon-class="education" /><span>Estado</span></div>
         <div class="user-bio-section-body">
           <div class="text-muted">
-            JS in Computer Science from the University of Technology
+            {{estado}}
           </div>
         </div>
       </div>
 
       <div class="user-skills user-bio-section">
-        <div class="user-bio-section-header"><svg-icon icon-class="skill" /><span>Skills</span></div>
+        <div class="user-bio-section-header"><svg-icon icon-class="skill" /><span>Patologias</span></div>
         <div class="user-bio-section-body">
-          <div class="progress-item">
-            <span>Vue</span>
-            <el-progress :percentage="70" />
-          </div>
-          <div class="progress-item">
-            <span>JavaScript</span>
-            <el-progress :percentage="18" />
-          </div>
-          <div class="progress-item">
-            <span>Css</span>
-            <el-progress :percentage="12" />
-          </div>
-          <div class="progress-item">
-            <span>ESLint</span>
-            <el-progress :percentage="100" status="success" />
+          <div class="progress-item" >
+            <ul>
+              <li v-for="item in paciente" :key="item.id">
+                {{ item.patologias}}
+              </li>
+            </ul>
           </div>
         </div>
       </div>
@@ -54,6 +45,7 @@
 
 <script>
 import PanThumb from '@/components/PanThumb'
+import vemecServices from '@/api/vemecServices'
 
 export default {
   components: { PanThumb },
@@ -69,8 +61,58 @@ export default {
         }
       }
     }
+  },
+  data (){
+    return {
+      paciente:{
+            id: null,
+            nombre:'',
+            apellido:'',
+            edad: null,
+            patologias:[{
+              id: '',
+              patologias:[]
+            }],
+            ingresos:[{
+              causa:'',
+              estado:'',
+              fechaIngreso:'',
+              sala:'',
+              vemec:'',
+            }]
+          },
+          sizeIngreso:'',
+          estado:'',
+      listQuery: {
+          page: 1,
+          limit: 10,
+          paciente: null,
+          nombre: '',
+          apellido: '',
+          edad: null
+        }
+    }
+  },
+  created(){
+    this.listQuery.paciente = this.$route.params.id
+    this.getPaciente()
+  },
+  methods: {
+    async getPaciente() {
+      this.listLoading = true
+      await vemecServices.services.getPacienteByID(this.listQuery.paciente)
+      .then(response => {
+        this.paciente = response.data;
+        this.sizeIngreso = parseInt(this.paciente.ingresos.length)-1; 
+        this.estado = this.paciente.ingresos[(this.sizeIngreso)-1].estado
+        //console.log(this.paciente.ingresos[(this.sizeIngreso)-1].estado);
+        
+      }).catch(err => console.log(err))
+      this.listLoading = false
+    },
   }
 }
+
 </script>
 
 <style lang="scss" scoped>

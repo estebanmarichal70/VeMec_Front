@@ -32,7 +32,7 @@
 import { mapGetters } from 'vuex'
 import UserCard from './components/UserCard'
 import Activity from './components/Activity'
-import Ingresos from './components/TimeLine'
+import Ingresos from './components/Timeline'
 import Account from './components/Account'
 import vemecServices from '@/api/vemecServices'
 
@@ -82,7 +82,7 @@ export default {
       await vemecServices.services.getPacienteByID(this.listQuery.paciente)
       .then(response => {
         this.paciente = response.data;
-        this.sizeIngreso = parseInt(this.paciente.ingresos.length)-1; 
+        this.sizeIngreso = parseInt(this.paciente.ingresos.length)-1;
 
         if(this.sizeIngreso >= 0){
           this.estado = this.paciente.ingresos[(this.sizeIngreso)].estado;

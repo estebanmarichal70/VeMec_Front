@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.causa" placeholder="" style="width: 250px;" class="filter-item"
+      <el-input v-model="listQuery.causa" placeholder="" style="width: 280px;" class="filter-item"
                 @input="handleFilter"/>
 
       <!--<el-select @change="handleFilter()" v-model="listQuery.codigo" placeholder="Codigo" clearable class="filter-item" style="width: 130px">
@@ -28,7 +28,7 @@
     <el-table
       :key="tableKey"
       v-loading="listLoading"
-      :data="reportes"
+      :data="list"
       border
       fit
       highlight-current-row
@@ -40,7 +40,7 @@
         prop="id"
         sortable="custom"
         align="center"
-        width="80"
+        width="75"
         :class-name="getSortClass('id')"
       >
         <template slot-scope="{row}">
@@ -48,25 +48,73 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="presionMaxima" align="center" width="80px">
+      <el-table-column label="Presión Máxima" align="center" width="80px">
         <template slot-scope="{row}">
-          <span>{{ row.presionMaxima }}</span>
+          <span>{{ row.presionMaxima + row.unidadPresion}}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="presionMinima" align="center" min-width="100px">
+      <el-table-column label="Presión Mínima" align="center" min-width="80px">
         <template slot-scope="{row}">
-          <span>{{ row.presionMinima }}</span>
+          <span>{{ row.presionMinima + row.unidadPresion}}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Direccion" align="center">
-        <template slot-scope="">
-          <span>{{  }}</span>
+      <el-table-column label="Volumen Gas" align="center" min-width="80px">
+        <template slot-scope="{row}">
+          <span>{{ row.volGas + row.unidadVolumen}}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Acciones" align="center" width="230px">
+      <el-table-column label="Frecuencia Gas" align="center" min-width="95px">
+        <template slot-scope="{row}">
+          <span>{{ row.frecGas + row.unidadFrecuencia}}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="Mezcla" align="center" min-width="80px">
+        <template slot-scope="{row}">
+          <span>{{ row.mezcla + row.unidadHumedad}}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="Humedad Aire" align="center" min-width="85px">
+        <template slot-scope="{row}">
+          <span>{{ row.humedadAire + row.unidadHumedad}}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="Temperatura Entrada" align="center" min-width="110px">
+        <template slot-scope="{row}">
+          <span>{{ row.tempEntrada + row.unidadTemp}}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="Temperatura Salida" align="center" min-width="110px">
+        <template slot-scope="{row}">
+          <span>{{ row.tempSalida + row.unidadTemp}}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="Presion Entrada" align="center" min-width="80px">
+        <template slot-scope="{row}">
+          <span>{{ row.presionEntrada + row.unidadPresion}}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="Presion Salida" align="center" min-width="80px">
+        <template slot-scope="{row}">
+          <span>{{ row.presionSalida + row.unidadPresion}}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="Fecha" align="center" min-width="85px">
+        <template slot-scope="{row}">
+          <span>{{ parseFecha(row.time,'lll')}}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="Acciones" align="center" width="200px">
         <template slot-scope="{row,$index}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             Actualizar
@@ -91,8 +139,57 @@
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
-    <el-dialog :title="textMap[dialogStatus]" center width="40%" :visible.sync="dialogFormVisible">
+    <el-dialog :title="textMap[dialogStatus]" align="center" width="40%" :visible.sync="dialogFormVisible">
+        
+        <el-form
+        ref="dataForm"
+    
+        :model="reporte"
+        label-position="top"
+        style="width: 80%; margin-left: 40px"
+      >
 
+        <el-form-item label="Presion Maxima" prop="pmax">
+            <el-input-number v-model="reporte.presionMaxima" :precision="2" :step="0.1"></el-input-number>
+        </el-form-item>
+
+        <el-form-item label="Presion Minima" prop="pmin">
+            <el-input-number v-model="reporte.presionMinima" :precision="2" :step="0.1"></el-input-number>
+        </el-form-item>
+
+        <el-form-item label="Presion Entrada" prop="pe">
+            <el-input-number v-model="reporte.presionEntrada" :precision="2" :step="0.1"></el-input-number>
+        </el-form-item>
+
+        <el-form-item label="Presion Salida" prop="ps">
+            <el-input-number v-model="reporte.presionSalida" :precision="2" :step="0.1"></el-input-number>
+        </el-form-item>
+
+        <el-form-item label="Volumen Gas" prop="vg">
+            <el-input-number v-model="reporte.volGas" :precision="2" :step="0.1"></el-input-number>
+        </el-form-item>
+
+        <el-form-item label="Frecuencia gas" prop="fg">
+            <el-input-number v-model="reporte.frecGas" :precision="2" :step="0.1"></el-input-number>
+        </el-form-item>
+
+        <el-form-item label="Mazcla" prop="m">
+            <el-input-number v-model="reporte.mezcla" :precision="2" :step="0.1"></el-input-number>
+        </el-form-item>
+
+        <el-form-item label="Humedad Aire" prop="ha">
+            <el-input-number v-model="reporte.humedadAire" :precision="2" :step="0.1"></el-input-number>
+        </el-form-item>
+
+        <el-form-item label="Temperatura Entrada" prop="te">
+            <el-input-number v-model="reporte.tempEntrada" :precision="2" :step="0.1"></el-input-number>
+        </el-form-item>
+
+        <el-form-item label="Temperatura Salida" prop="ts">
+            <el-input-number v-model="reporte.tempSalida" :precision="2" :step="0.1"></el-input-number>
+        </el-form-item>
+
+      </el-form>
       <div slot="footer" class="dialog-footer">
 
         <el-button @click="dialogFormVisible = false">
@@ -114,6 +211,7 @@ import Pagination from '@/components/Pagination' // secondary package based on e
 import debounce from 'lodash.debounce'
 import vemecServices from '@/api/vemecServices'
 import codigos from '@/constants/codigos'
+import {convertirFecha} from '@/utils/index'
 
 export default {
   name: 'ComplexTable',
@@ -138,7 +236,23 @@ export default {
       rowToDelete: null,
       indexToDelete: null,
       ingresoID: null,
-      reportes: null,
+      reporte: {
+          presionMaxima:'',
+          presionMinima:'',
+          volGas:'',
+          frecGas:'',
+          mezcla:'',
+          humedadAire:'',
+          tempEntrada:'',
+          tempSalida:'',
+          presionEntrada:'',
+          presionSalida:'',
+          unidadTemp:'',
+          unidadHumedad:'',
+          unidadFrecuencia:'',
+          unidadVolumen:'',
+          unidadPresion:''
+      },
       listQuery: {
         page: 1,
         limit: 10,
@@ -151,8 +265,8 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        update: 'Editar un centro',
-        create: 'Crear un nuevo centro'
+        update: 'Editar un Reporte',
+        create: 'Crear un nuevo reporte'
       },
       rules: {
         nombre: [{ required: true, message: 'Debe ingresar un nombre', trigger: 'blur' }],
@@ -164,27 +278,19 @@ export default {
   },
   mounted() {
     this.handleFilter = debounce(this.handleFilter, 300);
-  },
-  computed: {
-
-  },
-  created() {
-    this.getList()
     this.ingresoID = this.$route.params.id
+    this.getList()
   },
   methods: {
     async getList() {
       this.listLoading = true
-      await vemecServices.services.getIngresos({
+      await vemecServices.services.getReportes({
         page: this.listQuery.page,
         limit: this.listQuery.limit,
-        causa: this.listQuery.causa,
         id: parseInt(this.ingresoID)
       }).then(response => {
-          //console.log(response.data[2]);
         this.list = response.data[2]
-        this.reportes = this.list.historial;
-        console.log(this.list[0].historial);
+        console.log(this.list);
         this.total = response.data[1]
       }).catch(err => console.log(err))
       this.listLoading = false
@@ -236,7 +342,7 @@ export default {
             this.total++
             this.$notify({
               title: 'Éxito',
-              message: 'Se creó el centro correctamente',
+              message: 'Se creó el reporte correctamente',
               type: 'success',
               duration: 3000
             })
@@ -252,10 +358,21 @@ export default {
       })
     },
     handleUpdate(row) {
-      this.centro.codigo = row.codigo
-      this.centro.direccion = row.direccion
-      this.centro.nombre = row.nombre
-      this.centro.id = row.id
+      this.reporte.presionMaxima = row.presionMaxima;
+      this.reporte.presionMinima = row.presionMinima;
+      this.reporte.frecGas = row.frecGas;
+      this.reporte.volGas = row.volGas;
+      this.reporte.mezcla = row.mezcla;
+      this.reporte.humedadAire = row.humedadAire;
+      this.reporte.tempEntrada = row.tempEntrada;
+      this.reporte.tempSalida = row.tempSalida;
+      this.reporte.presionEntrada = row.presionEntrada;
+      this.reporte.presionSalida = row.presionSalida;
+      this.reporte.unidadTemp = row.unidadTemp;
+      this.reporte.unidadHumedad = row.unidadHumedad;
+      this.reporte.unidadFrecuencia = row.unidadFrecuencia;
+      this.reporte.unidadVolumen = row.unidadVolumen;
+      this.reporte.unidadPresion = row.unidadPresion;
 
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
@@ -277,7 +394,7 @@ export default {
               })
               this.$notify({
                 title: 'Éxito',
-                message: 'Se actualizó el centro correctamente',
+                message: 'Se actualizó el reporte correctamente',
                 type: 'success',
                 duration: 3000
               })
@@ -357,6 +474,9 @@ export default {
     getSortClass: function(key) {
       const sort = this.listQuery.sort
       return sort === `+${key}` ? 'ascending' : 'descending'
+    },
+     parseFecha(unix_timestamp, formato){
+      return convertirFecha(unix_timestamp, formato);
     }
   }
 }

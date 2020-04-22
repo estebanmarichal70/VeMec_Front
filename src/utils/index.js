@@ -1,6 +1,3 @@
-/**
- * Created by PanJiaChen on 16/11/18.
- */
 
 /**
  * Parse the time to string
@@ -8,6 +5,13 @@
  * @param {string} cFormat
  * @returns {string | null}
  */
+import moment from 'moment'
+
+export function convertirFecha(unix_timestamp, formato){
+  moment.locale('es'); 
+  return moment(unix_timestamp).format(formato);
+}
+
 export function parseTime(time, cFormat) {
   if (arguments.length === 0) {
     return null

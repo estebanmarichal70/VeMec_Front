@@ -2,7 +2,7 @@
   <div class="block">
       <div class="block">
     <el-timeline>
-      <el-timeline-item  v-for="(item,index) of ingresos " :timestamp="convertirFecha(item.fechaIngreso)" :key="index" placement="top">
+      <el-timeline-item  v-for="(item,index) of ingresos " :timestamp="parseFecha(item.fechaIngreso,'LLLL')" :key="index" placement="top">
         <el-card>
           <p><strong> Causa: </strong>{{ item.causa }}</p>
           <strong>Estado: </strong><el-badge v-if="item.estado == 'ESTABLE' " :value="item.estado" class="item" type="primary">
@@ -17,7 +17,7 @@
           </el-badge>
           <p><strong>Vemec: </strong>{{ item.vemec.id }}</p>
           <p><strong>Sala: </strong>{{salas[index].nombre}}</p>
-          <p><strong>Fecha de alta: </strong><p v-if="item.fechaEgreso">{{convertirFecha(item.fechaEgreso)}}</p><p v-else> Internado </p>
+          <p><strong>Fecha de alta: </strong><p v-if="item.fechaEgreso">{{parseFecha(item.fechaEgreso,'LLLL')}}</p><p v-else> Internado </p>
           <router-link :to="`/reporte/${item.id}`">
             <el-button type="info" plain>
              Reportes
@@ -32,8 +32,8 @@
 
 <script>
 
-import moment from 'moment'
 import vemecServices from '@/api/vemecServices'
+import {convertirFecha} from '@/utils/index'
 
 export default {
   props: [
@@ -50,9 +50,8 @@ export default {
     this.getSala();
   },
   methods: {
-    convertirFecha(unix_timestamp){
-      moment.locale('es'); 
-      return moment(unix_timestamp).format('LLLL');
+    parseFecha(unix_timestamp, formato){
+      return convertirFecha(unix_timestamp, formato);
     },
     async getSala(){
       this.listLoading = true

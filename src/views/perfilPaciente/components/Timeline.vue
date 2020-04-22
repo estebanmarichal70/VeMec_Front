@@ -18,7 +18,11 @@
           <p><strong>Vemec: </strong>{{ item.vemec.id }}</p>
           <p><strong>Sala: </strong>{{salas[index].nombre}}</p>
           <p><strong>Fecha de alta: </strong><p v-if="item.fechaEgreso">{{convertirFecha(item.fechaEgreso)}}</p><p v-else> Internado </p>
-          <el-button type="info" plain>Reportes</el-button>
+          <router-link :to="`/reporte/${item.id}`">
+            <el-button type="info" plain>
+             Reportes
+            </el-button>
+          </router-link>
         </el-card>
       </el-timeline-item>
     </el-timeline>

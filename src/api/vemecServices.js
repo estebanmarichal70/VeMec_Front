@@ -96,6 +96,9 @@ export default {
     salaIngreso(id){
       addDefaultHeaders();
       return axios.get(apiUrl + `/ingreso/sala/${id}`)
+    },
+    getIngresos({ page, limit, causa, id }) {
+      return axios.get(apiUrl + `/ingreso?page=${page}&limit=${limit}&causa=${causa}&id=${id}`)
     }
   }
 }

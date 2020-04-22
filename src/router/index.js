@@ -134,6 +134,18 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/reporte',
+    component: Layout,
+    redirect: 'noRedirect',
+    children: [
+      {
+        path: '/reporte/:id',
+        component: () => import('@/views/reporte/reporte'),
+        name: 'Reporte',
+      }
+    ]
+  },
+  {
     path: '/documentation',
     component: Layout,
     children: [

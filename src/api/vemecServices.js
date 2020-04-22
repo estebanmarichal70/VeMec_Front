@@ -99,6 +99,10 @@ export default {
     },
     getIngresos({ page, limit, causa, id }) {
       return axios.get(apiUrl + `/ingreso?page=${page}&limit=${limit}&causa=${causa}&id=${id}`)
+    },
+    // reportes
+    getReportes({ page, limit, id }) {
+      return axios.get(apiUrl + `/reporte?page=${page}&limit=${limit}&id=${id}`)
     }
   }
 }

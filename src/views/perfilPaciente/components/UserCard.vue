@@ -19,10 +19,10 @@
 
     <div class="user-bio">
       <div class="user-education user-bio-section">
-        <div class="user-bio-section-header"><svg-icon icon-class="education" /><span>Estado</span></div>
+        <div class="user-bio-section-header"><svg-icon icon-class="education" /><span>Actualmente</span></div>
         <div class="user-bio-section-body">
           <div class="text-muted">
-            {{estado}}
+            {{paciente.ingresos[(paciente.ingresos.length)-1].estado}}
           </div>
         </div>
       </div>
@@ -32,8 +32,8 @@
         <div class="user-bio-section-body">
           <div class="progress-item" >
             <ul>
-              <li v-for="item in paciente" :key="item.id">
-                {{ item.patologias}}
+              <li v-for="item in paciente.patologias.patologias" :key="item.key">
+                {{ item }}
               </li>
             </ul>
           </div>
@@ -60,56 +60,8 @@ export default {
           role: ''
         }
       }
-    }
-  },
-  data (){
-    return {
-      paciente:{
-            id: null,
-            nombre:'',
-            apellido:'',
-            edad: null,
-            patologias:[{
-              id: '',
-              patologias:[]
-            }],
-            ingresos:[{
-              causa:'',
-              estado:'',
-              fechaIngreso:'',
-              sala:'',
-              vemec:'',
-            }]
-          },
-          sizeIngreso:'',
-          estado:'',
-      listQuery: {
-          page: 1,
-          limit: 10,
-          paciente: null,
-          nombre: '',
-          apellido: '',
-          edad: null
-        }
-    }
-  },
-  created(){
-    this.listQuery.paciente = this.$route.params.id
-    this.getPaciente()
-  },
-  methods: {
-    async getPaciente() {
-      this.listLoading = true
-      await vemecServices.services.getPacienteByID(this.listQuery.paciente)
-      .then(response => {
-        this.paciente = response.data;
-        this.sizeIngreso = parseInt(this.paciente.ingresos.length)-1; 
-        this.estado = this.paciente.ingresos[(this.sizeIngreso)-1].estado
-        //console.log(this.paciente.ingresos[(this.sizeIngreso)-1].estado);
-        
-      }).catch(err => console.log(err))
-      this.listLoading = false
     },
+    paciente:''
   }
 }
 

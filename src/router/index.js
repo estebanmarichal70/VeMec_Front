@@ -122,7 +122,7 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/paciente',
+    path: '/perfil',
     component: Layout,
     redirect: 'noRedirect',
     children: [

@@ -1,42 +1,44 @@
 <template>
   <div class="block">
+      <div class="block">
     <el-timeline>
-      <el-timeline-item v-for="(item,index) of timeline" :key="index" :timestamp="item.timestamp" placement="top">
+      <el-timeline-item v-for="(item,index) of ingresos " :timestamp="convertirFecha(item.fechaIngreso)" :key="index" placement="top">
         <el-card>
-          <h4>{{ item.title }}</h4>
-          <p>{{ item.content }}</p>
+          <p><strong> Causa: </strong>{{ item.causa }}</p>
+          <strong>Estado: </strong><el-badge v-if="item.estado == 'ESTABLE' " :value="item.estado" class="item" type="primary">
+          </el-badge>
+          <el-badge v-if="item.estado == 'CRITICO' " :value="item.estado" class="item" type="warning">
+          </el-badge>
+          <p><strong>Vemec: </strong>{{ item.vemec.id }}</p>
+          <p><strong>Sala: </strong>Falta Buscar la sala</p>
+          <p><strong>Fecha de alta: </strong><p v-if="item.fechaEgreso">{{ item.fechaEgreso }}</p><p v-else> Internado </p>
         </el-card>
       </el-timeline-item>
     </el-timeline>
   </div>
+  </div>
 </template>
 
 <script>
+
+import moment from 'moment'
+
 export default {
-  data() {
-    return {
-      timeline: [
-        {
-          timestamp: '2019/4/20',
-          title: 'Update Github template',
-          content: 'PanJiaChen committed 2019/4/20 20:46'
-        },
-        {
-          timestamp: '2019/4/21',
-          title: 'Update Github template',
-          content: 'PanJiaChen committed 2019/4/21 20:46'
-        },
-        {
-          timestamp: '2019/4/22',
-          title: 'Build Template',
-          content: 'PanJiaChen committed 2019/4/22 20:46'
-        },
-        {
-          timestamp: '2019/4/23',
-          title: 'Release New Version',
-          content: 'PanJiaChen committed 2019/4/23 20:46'
-        }
-      ]
+  props: [
+    'paciente'
+  ],
+  data(){
+    return{
+      ingresos: null
+    }
+  },
+  mounted(){
+    this.ingresos = this.paciente.ingresos;
+  },
+  methods: {
+    convertirFecha(unix_timestamp){
+      moment.locale('es'); 
+      return moment(unix_timestamp).format('LLLL');
     }
   }
 }

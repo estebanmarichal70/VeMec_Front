@@ -21,7 +21,7 @@
       <div class="user-education user-bio-section">
         <div class="user-bio-section-header"><svg-icon icon-class="education" /><span>Actualmente</span></div>
         <div class="user-bio-section-body">
-          <div class="text-muted">
+          <div class="text-muted" v-if="paciente.ingresos[(paciente.ingresos.length)-1].estado">
             {{paciente.ingresos[(paciente.ingresos.length)-1].estado}}
           </div>
         </div>

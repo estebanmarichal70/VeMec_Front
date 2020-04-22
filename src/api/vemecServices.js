@@ -69,6 +69,10 @@ export default {
     },
     deletePaciente(id) {
       return axios.delete(apiUrl + `/paciente/${id}`)
+    },
+    // ingresos
+    salaIngreso(id){
+      return axios.get(apiUrl + `/ingreso/sala/${id}`)
     }
   }
 }

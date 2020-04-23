@@ -2,13 +2,13 @@ const baseUrl = 'http://localhost:8080'
 const basePath = '/api/v1'
 const apiUrl = baseUrl + basePath
 
-import axios from 'axios';
+var axios = require("axios");
 
 let addDefaultHeaders = () => {
-  axios.defaults.headers.common['Authorization'] = "Bearer " + JSON.parse(localStorage.getItem('access_token'));
+  axios.defaults.headers.common['Authorization'] = "Bearer " + "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTU4NzcxNzQwMSwiaWF0IjoxNTg3NjgxNDAxfQ.mpUIb8XJuLClY3VTvNdJMTLpH-Hbw1N7cu9klguwkSU";
 }
 
-export default {
+module.exports = {
   services: {
     login(data){
       return axios.post(apiUrl + "/auth/sign_in", data);
@@ -122,5 +122,9 @@ export default {
       addDefaultHeaders();
       return axios.delete(apiUrl + `/reporte/${id}`)
     },
+    createIngreso(data){
+      addDefaultHeaders();
+      return axios.post(apiUrl + `/ingreso`, data);
+    }
   }
 }

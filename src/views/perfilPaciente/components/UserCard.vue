@@ -21,7 +21,7 @@
       <div class="user-education user-bio-section">
         <div class="user-bio-section-header"><svg-icon icon-class="education" /><span>Actualmente</span></div>
         <div class="user-bio-section-body">
-          <div class="text-muted" v-if="paciente.ingresos[(paciente.ingresos.length)-1].estado">
+          <div class="text-muted" v-if="paciente.ingresos[paciente.ingresos.length-1]">
             {{paciente.ingresos[(paciente.ingresos.length)-1].estado}}
           </div>
         </div>
@@ -45,8 +45,6 @@
 
 <script>
 import PanThumb from '@/components/PanThumb'
-import vemecServices from '@/api/vemecServices'
-
 export default {
   components: { PanThumb },
   props: {
@@ -62,6 +60,9 @@ export default {
       }
     },
     paciente:''
+  },
+  mounted() {
+    console.log(this.paciente);
   }
 }
 

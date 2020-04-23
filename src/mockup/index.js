@@ -8,12 +8,13 @@
 "use strict";
 
 var datos = require("./data");
-var axios = require("axios");
+
+var vemecServices = require("../api/vemecServices");
 
 let sobrecargaCentros = () => {
 
   datos.centros.forEach(value => {
-     axios.post("http://localhost:8080/api/v1/centro", value)
+    vemecServices.services.createCentro(value)
       .then(response => {
         console.log(`Se agrego el centro ${value.nombre}`)
     }).catch(err => console.log(err))
@@ -25,7 +26,7 @@ let sobrecargaCentros = () => {
 let sobrecargaSalas = () => {
 
   datos.salas.forEach(value => {
-     axios.post("http://localhost:8080/api/v1/sala", value)
+    vemecServices.services.createSala(value)
       .then(response => {
         console.log(`Se agrego la sala ${value.nombre}`)
       }).catch(err => console.log(err))
@@ -36,7 +37,7 @@ let sobrecargaSalas = () => {
 let sobrecargaVemecs = () => {
 
   datos.vemecs.forEach(value => {
-     axios.post("http://localhost:8080/api/v1/vemec", value)
+    vemecServices.services.createVemec(value)
       .then(response => {
         console.log(`Se agrego el vemec ${value.nombre}`)
       }).catch(err => console.log(err))
@@ -47,7 +48,7 @@ let sobrecargaVemecs = () => {
 let sobrecargaPacientes = () => {
 
   datos.pacientes.forEach(value => {
-     axios.post("http://localhost:8080/api/v1/paciente", value)
+    vemecServices.services.createPaciente(value)
       .then(response => {
         console.log(`Se agrego el paciente ${value.id}`)
       }).catch(err => console.log(err))
@@ -58,7 +59,7 @@ let sobrecargaPacientes = () => {
 let sobrecargaIngresos = () => {
 
   datos.ingresos.forEach(value => {
-     axios.post("http://localhost:8080/api/v1/ingreso", value)
+    vemecServices.services.createIngreso(value)
       .then(response => {
         console.log(`Se agrego el ingreso ${value.causa}`)
       }).catch(err => console.log(err))
@@ -69,14 +70,14 @@ let sobrecargaIngresos = () => {
 let sobrecargaReporte = () => {
 
   datos.reporte_1.forEach(value => {
-     axios.post("http://localhost:8080/api/v1/reporte", value)
+    vemecServices.services.createReporte(value)
       .then(response => {
         console.log(`Se agrego el reporte`)
       }).catch(err => console.log(err))
   });
 
   datos.reporte_2.forEach(value => {
-     axios.post("http://localhost:8080/api/v1/reporte", value)
+    vemecServices.services.createReporte(value)
       .then(response => {
         console.log(`Se agrego el reporte`)
       }).catch(err => console.log(err))

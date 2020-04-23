@@ -4,7 +4,7 @@
       <el-row :gutter="20">
 
         <el-col :span="6" :xs="24">
-          <user-card v-if="paciente" :paciente="paciente" :user="user" />
+          <user-card v-if="paciente" :paciente="paciente" />
         </el-col>
 
         <el-col :span="18" :xs="24">
@@ -15,9 +15,6 @@
               </el-tab-pane>
               <el-tab-pane label="Ingresos" name="ingresos">
                 <Ingresos v-if="paciente" :paciente="paciente" />
-              </el-tab-pane>
-              <el-tab-pane label="Cuenta" name="account">
-                <account :user="user" />
               </el-tab-pane>
             </el-tabs>
           </el-card>
@@ -37,7 +34,6 @@ import Account from './components/Account'
 import vemecServices from '@/api/vemecServices'
 
 export default {
-  name: 'Profile',
   components: { UserCard, Activity, Ingresos, Account },
   data() {
     return {
@@ -63,19 +59,10 @@ export default {
     ])
   },
   created() {
-    this.getUser()
     this.listQuery.paciente = this.$route.params.id
     this.getPaciente()
   },
   methods: {
-    getUser() {
-      this.user = {
-        name: this.name,
-        role: this.roles.join(' | '),
-        email: 'admin@test.com',
-        avatar: this.avatar
-      }
-    },
     async getPaciente() {
       this.listLoading = true
       await vemecServices.services.getPacienteByID(this.listQuery.paciente)

@@ -73,7 +73,7 @@ export const constantRoutes = [
         path: 'dashboard',
         component: () => import('@/views/dashboard/index'),
         name: 'Dashboard',
-        meta: { title: 'Dashboard', icon: 'dashboard', affix: true }
+        meta: { title: 'Dashboard', icon: 'dashboard', affix: true, requiresAuth: true},
       }
     ]
   },
@@ -86,7 +86,7 @@ export const constantRoutes = [
         path: '/centro',
         component: () => import('@/views/centro/centro'),
         name: 'Centro',
-        meta: { title: 'Centros', icon: 'international', affix: true }
+        meta: { title: 'Centros', icon: 'international', affix: true, requiresAuth: true},
       }
     ]
   },
@@ -94,11 +94,13 @@ export const constantRoutes = [
     path: '/sala',
     component: Layout,
     redirect: 'noRedirect',
+    hidden: true,
     children: [
       {
         path: '/sala/:id',
         component: () => import('@/views/sala/sala'),
-        name: 'Sala'
+        name: 'Sala',
+        meta: { title: 'Sala', icon: 'international', affix: true,requiresAuth: true },
       }
     ]
   },
@@ -111,7 +113,7 @@ export const constantRoutes = [
         path: '/paciente',
         component: () => import('@/views/paciente/paciente'),
         name: 'Paciente',
-        meta: { title: 'Pacientes', icon: 'dashboard', affix: true }
+        meta: { title: 'Pacientes', icon: 'dashboard', affix: true, requiresAuth: true },
       }
     ]
   },
@@ -119,11 +121,13 @@ export const constantRoutes = [
     path: '/perfil',
     component: Layout,
     redirect: 'noRedirect',
+    hidden: true,
     children: [
       {
         path: '/perfil/:id',
         component: () => import('@/views/perfilPaciente/index'),
         name: 'Perfil',
+        meta: { title: 'Perfil', icon: 'person', affix: true, requiresAuth: true },
       }
     ]
   },
@@ -131,11 +135,13 @@ export const constantRoutes = [
     path: '/reporte',
     component: Layout,
     redirect: 'noRedirect',
+    hidden: true,
     children: [
       {
         path: '/reporte/:id',
         component: () => import('@/views/reporte/reporte'),
         name: 'Reporte',
+        meta: { title: 'Reportes', icon: 'dashboard', affix: true, requiresAuth: true }
       }
     ]
   },
@@ -144,10 +150,45 @@ export const constantRoutes = [
 
 const createRouter = () => new Router({
   scrollBehavior: () => ({ y: 0 }),
+  mode: 'history',
   routes: constantRoutes
 })
 
 const router = createRouter()
+
+router.beforeEach((to, from, next) => {
+  if(to.matched.some(record => record.meta.requiresAuth)) {
+    if (localStorage.getItem('access_token') == null) {
+      next({
+        path: '/login',
+        params: { nextUrl: to.fullPath }
+      })
+    } else {
+      console.log("access token existe")
+      let user = JSON.parse(localStorage.getItem('user'))
+      if(to.matched.some(record => record.meta.is_admin)) {
+        if(user.is_admin == 1){
+          next()
+        }
+        else{
+          next({ name: 'userboard'})
+        }
+      }else {
+        next()
+      }
+    }
+  } else if(to.matched.some(record => record.meta.guest)) {
+    if(localStorage.getItem('jwt') == null){
+      next()
+    }
+    else{
+      next({ name: 'userboard'})
+    }
+  }else {
+    next()
+  }
+})
+
 
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {

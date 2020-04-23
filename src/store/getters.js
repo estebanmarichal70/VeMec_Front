@@ -6,6 +6,6 @@ const getters = {
   cachedViews: state => state.tagsView.cachedViews,
   token: state => state.user.token,
   errorLogs: state => state.errorLog.logs,
-  access_token: state => state.user.access_token
+  access_token: state => state.user.access_token,
 }
 export default getters

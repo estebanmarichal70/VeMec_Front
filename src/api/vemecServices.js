@@ -5,7 +5,7 @@ const apiUrl = baseUrl + basePath
 var axios = require("axios");
 
 let addDefaultHeaders = () => {
-  axios.defaults.headers.common['Authorization'] = "Bearer " + "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTU4NzcxNzQwMSwiaWF0IjoxNTg3NjgxNDAxfQ.mpUIb8XJuLClY3VTvNdJMTLpH-Hbw1N7cu9klguwkSU";
+  axios.defaults.headers.common['Authorization'] = "Bearer " + JSON.parse(localStorage.getItem('access_token'));
 }
 
 module.exports = {

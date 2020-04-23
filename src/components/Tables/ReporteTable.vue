@@ -143,7 +143,7 @@
         
         <el-form
         ref="dataForm"
-    
+        :rules="rules"
         :model="reporte"
         label-position="top"
         style="width: 80%; margin-left: 40px"
@@ -169,7 +169,7 @@
             <el-input-number v-model="reporte.volGas" :precision="2" :step="0.1"></el-input-number>
         </el-form-item>
 
-        <el-form-item label="Frecuencia gas" prop="fg">
+        <el-form-item label="Frecuencia Gas" prop="fg">
             <el-input-number v-model="reporte.frecGas" :precision="2" :step="0.1"></el-input-number>
         </el-form-item>
 
@@ -259,7 +259,6 @@ export default {
         causa: null,
         sort: '+id'
       },
-      codigos,
       importanceOptions: [1, 2, 3],
       sortOptions: [{ label: 'Ascendente', key: '+id' }, { label: 'Descendente', key: '-id' }],
       dialogFormVisible: false,
@@ -269,9 +268,16 @@ export default {
         create: 'Crear un nuevo reporte'
       },
       rules: {
-        nombre: [{ required: true, message: 'Debe ingresar un nombre', trigger: 'blur' }],
-        direccion: [{ required: true, message: 'Debe ingresar una direccion', trigger: 'blur' }],
-        codigo: [{ required: true, message: 'Debe seleccionar un departamento', trigger: 'blur' }]
+        pmax: [{ required: false, message: 'Debe ingresar una Presion Maxima', trigger: 'blur' }],
+        pmin: [{ required: false, message: 'Debe ingresar una Presion Minima', trigger: 'blur' }],
+        pe: [{ required: false, message: 'Debe seleccionar una Presion de Entrada', trigger: 'blur' }],
+        ps: [{ required: false, message: 'Debe seleccionar una Presion de Salida', trigger: 'blur' }],
+        vg: [{ required: false, message: 'Debe seleccionar una Volumen de Gas', trigger: 'blur' }],
+        fg: [{ required: false, message: 'Debe seleccionar una Frecuncia de Gas', trigger: 'blur' }],
+        m: [{ required: false, message: 'Debe seleccionar una Mezcla', trigger: 'blur' }],
+        ha: [{ required: false, message: 'Debe seleccionar una Humedad Aire', trigger: 'blur' }],
+        te: [{ required: false, message: 'Debe seleccionar una Temperatura Entrada', trigger: 'blur' }],
+        ts: [{ required: false, message: 'Debe seleccionar una Temperatura Salida', trigger: 'blur' }]
       },
       downloadLoading: false
     }
@@ -321,7 +327,7 @@ export default {
       this.handleFilter()
     },
     handleCreate() {
-      this.resetCentro()
+      this.resetReporte()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -331,12 +337,26 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          const centroNuevo = {
-            nombre: this.centro.nombre,
-            codigo: this.centro.codigo,
-            direccion: this.centro.direccion
+          var hoy = new Date();
+          var fecha = (hoy.getDate() + '-' + (hoy.getMonth() +1) + '-' + hoy.getFullYear());
+          var hora = hoy.getHours() + ':' + hoy.getMinutes() + ':' + hoy.getSeconds();
+          const reporteNuevo = {
+              presionMaxima: parseFloat(this.reporte.presionMaxima.toFixed(2)),
+              presionMinima: parseFloat(this.reporte.presionMinima.toFixed(2)),
+              volGas: parseFloat(this.reporte.frecGas.toFixed(2)),
+              frecGas: parseFloat(this.reporte.volGas.toFixed(2)),
+              mezcla: parseFloat(this.reporte.mezcla.toFixed(2)),
+              humedadAire: parseFloat(this.reporte.humedadAire.toFixed(2)),
+              tempEntrada: parseFloat(this.reporte.tempEntrada.toFixed(2)),
+              tempSalida: parseFloat(this.reporte.tempSalida.toFixed(2)),
+              presionEntrada: parseFloat(this.reporte.presionEntrada.toFixed(2)),
+              presionSalida: parseFloat(this.reporte.presionSalida.toFixed(2)),
+              time: fecha +" "+ hora,
+              ingreso: parseInt(this.ingresoID),
+              alerta:''                 //FALTA VER TEMA DE ALERTA
           }
-          vemecServices.services.createCentro(centroNuevo).then(res => {
+            
+          vemecServices.services.createReporte(reporteNuevo).then(res => {
             this.list.push(res.data)
             this.dialogFormVisible = false
             this.total++
@@ -358,6 +378,7 @@ export default {
       })
     },
     handleUpdate(row) {
+      this.reporte.id = parseInt(row.id);
       this.reporte.presionMaxima = row.presionMaxima;
       this.reporte.presionMinima = row.presionMinima;
       this.reporte.frecGas = row.frecGas;
@@ -383,13 +404,37 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          vemecServices.services.updateCentro(this.centro, this.centro.id)
+          var hoy = new Date();
+          var fecha = (hoy.getDate() + '-' + (hoy.getMonth() +1) + '-' + hoy.getFullYear());
+          var hora = hoy.getHours() + ':' + hoy.getMinutes() + ':' + hoy.getSeconds();
+          const reporteModificado = {
+              presionMaxima: parseFloat(this.reporte.presionMaxima.toFixed(2)),
+              presionMinima: parseFloat(this.reporte.presionMinima.toFixed(2)),
+              volGas: parseFloat(this.reporte.frecGas.toFixed(2)),
+              frecGas: parseFloat(this.reporte.volGas.toFixed(2)),
+              mezcla: parseFloat(this.reporte.mezcla.toFixed(2)),
+              humedadAire: parseFloat(this.reporte.humedadAire.toFixed(2)),
+              tempEntrada: parseFloat(this.reporte.tempEntrada.toFixed(2)),
+              tempSalida: parseFloat(this.reporte.tempSalida.toFixed(2)),
+              presionEntrada: parseFloat(this.reporte.presionEntrada.toFixed(2)),
+              presionSalida: parseFloat(this.reporte.presionSalida.toFixed(2)),
+              time: fecha +" "+ hora,
+              alerta:''               
+          }
+          vemecServices.services.updateReporte(reporteModificado, this.reporte.id )
             .then(response => {
               this.list.forEach((item, index) => {
                 if (item.id == response.data.id) {
-                  this.list[index].codigo = response.data.codigo
-                  this.list[index].nombre = response.data.nombre
-                  this.list[index].direccion = response.data.direccion
+                  this.list[index].presionMaxima = response.data.presionMaxima
+                  this.list[index].presionMinima = response.data.presionMinima
+                  this.list[index].presionEntrada = response.data.presionEntrada
+                  this.list[index].presionSalida = response.data.presionSalida
+                  this.list[index].frecGas = response.data.frecGas
+                  this.list[index].volGas = response.data.volGas
+                  this.list[index].mezcla = response.data.mezcla
+                  this.list[index].humedadAire = response.data.humedadAire
+                  this.list[index].tempEntrada = response.data.presionEntrada
+                  this.list[index].tempSalida = response.data.presionEntrada
                 }
               })
               this.$notify({
@@ -415,7 +460,7 @@ export default {
       this.listLoading = true
       this.rowToDelete = row
       this.indexToDelete = index
-      await vemecServices.services.deleteCentro(this.rowToDelete.id)
+      await vemecServices.services.deleteReporte(this.rowToDelete.id)
         .then(response => {
           if (response.data.status === 'SUCCESS') {
             this.total--
@@ -448,8 +493,8 @@ export default {
     handleDownload() {
       this.downloadLoading = true
         import('@/vendor/Export2Excel').then(excel => {
-          const tHeader = ['Id', 'Codigo', 'Nombre', 'Direccion']
-          const filterVal = ['id', 'codigo', 'nombre', 'direccion']
+          const tHeader = ['Id', 'Presion Maxima', 'Presion Minima', 'Presion Entrada', 'Presion Salida', 'Frecuencia Gas','Volumen Gas', 'Temperatura Entrada', 'Temperatura Salida', 'Mezcla', 'Humedad Aire']
+          const filterVal = ['id', 'Presion Maxima', 'Presion Minima', 'Presion Entrada', 'Presion Salida', 'Frecuencia Gas','Volumen Gas', 'Temperatura Entrada', 'Temperatura Salida', 'Mezcla', 'Humedad Aire']
           const data = this.formatJson(filterVal)
           excel.export_json_to_excel({
             header: tHeader,
@@ -459,11 +504,23 @@ export default {
           this.downloadLoading = false
         })
     },
-    resetCentro() {
-      this.centro = {
-        nombre: '',
-        direccion: '',
-        codigo: null
+    resetReporte() {
+      this.reporte = {
+          presionMaxima:'',
+          presionMinima:'',
+          volGas:'',
+          frecGas:'',
+          mezcla:'',
+          humedadAire:'',
+          tempEntrada:'',
+          tempSalida:'',
+          presionEntrada:'',
+          presionSalida:'',
+          unidadTemp:'',
+          unidadHumedad:'',
+          unidadFrecuencia:'',
+          unidadVolumen:'',
+          unidadPresion:''
       }
     },
     formatJson(filterVal) {
@@ -478,6 +535,6 @@ export default {
      parseFecha(unix_timestamp, formato){
       return convertirFecha(unix_timestamp, formato);
     }
-  }
+  },
 }
 </script>

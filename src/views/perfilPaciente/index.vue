@@ -32,7 +32,7 @@
 import { mapGetters } from 'vuex'
 import UserCard from './components/UserCard'
 import Activity from './components/Activity'
-import Ingresos from './components/Timeline'
+import Ingresos from './components/TimeLine'
 import Account from './components/Account'
 import vemecServices from '@/api/vemecServices'
 

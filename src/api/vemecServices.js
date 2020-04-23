@@ -101,10 +101,26 @@ export default {
       addDefaultHeaders();
       return axios.get(apiUrl + `/ingreso?page=${page}&limit=${limit}&causa=${causa}&id=${id}`)
     },
+    getIngresoByID(id) {
+      addDefaultHeaders();
+      return axios.get(apiUrl + `/ingreso/${id}`)
+    },
     // reportes
     getReportes({ page, limit, id }) {
       addDefaultHeaders();
       return axios.get(apiUrl + `/reporte?page=${page}&limit=${limit}&id=${id}`)
-    }
+    },
+    createReporte(data) {
+      addDefaultHeaders();
+      return axios.post(apiUrl + `/reporte`, data)
+    },
+    updateReporte(data, id) {
+      addDefaultHeaders();
+      return axios.put(apiUrl + `/reporte/${id}`, data)
+    },
+    deleteReporte(id) {
+      addDefaultHeaders();
+      return axios.delete(apiUrl + `/reporte/${id}`)
+    },
   }
 }

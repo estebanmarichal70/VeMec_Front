@@ -16,7 +16,7 @@
           <el-badge v-if="item.estado == 'DIFUNTO' " :value="item.estado" class="item" type="info">
           </el-badge>
           <p><strong>Vemec: </strong>{{ item.vemec.id }}</p>
-          <p><strong>Sala: </strong>{{salas[index].nombre}}</p>
+          <p v-if="salas[index]"><strong>Sala: </strong>{{salas[index].nombre}}</p>
           <p><strong>Fecha de alta: </strong><p v-if="item.fechaEgreso">{{parseFecha(item.fechaEgreso,'LLLL')}}</p><p v-else> Internado </p>
           <router-link :to="`/reporte/${item.id}`">
             <el-button type="info" plain>

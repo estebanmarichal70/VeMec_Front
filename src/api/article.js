@@ -21,8 +21,7 @@ export function fetchPv(pv) {
     url: '/vue-element-admin/article/pv',
     method: 'get',
     params: { pv }
-  })
-}
+  })}
 
 export function createArticle(data) {
   return request({

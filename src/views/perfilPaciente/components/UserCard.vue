@@ -6,7 +6,7 @@
 
     <div class="user-profile">
       <div class="box-center">
-        <pan-thumb :image="user.avatar" :height="'100px'" :width="'100px'" :hoverable="false">
+        <pan-thumb :height="'100px'" :width="'100px'" :hoverable="false">
           <div>Hola</div>
           {{ paciente.nombre }}
         </pan-thumb>

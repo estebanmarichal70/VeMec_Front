@@ -2,7 +2,7 @@ const baseUrl = 'http://localhost:8080'
 const basePath = '/api/v1'
 const apiUrl = baseUrl + basePath
 
-import axios from 'axios'
+import axios from 'axios';
 
 let addDefaultHeaders = () => {
   axios.defaults.headers.common['Authorization'] = "Bearer " + JSON.parse(localStorage.getItem('access_token'));
@@ -98,10 +98,12 @@ export default {
       return axios.get(apiUrl + `/ingreso/sala/${id}`)
     },
     getIngresos({ page, limit, causa, id }) {
+      addDefaultHeaders();
       return axios.get(apiUrl + `/ingreso?page=${page}&limit=${limit}&causa=${causa}&id=${id}`)
     },
     // reportes
     getReportes({ page, limit, id }) {
+      addDefaultHeaders();
       return axios.get(apiUrl + `/reporte?page=${page}&limit=${limit}&id=${id}`)
     }
   }

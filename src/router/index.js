@@ -73,7 +73,6 @@ export const constantRoutes = [
         path: 'inicio',
         component: () => import('@/views/dashboard/index'),
         name: 'Inicio',
-        meta: { title: 'Inicio', icon: 'hospitalColor', affix: true, requiresAuth: true},
       }
     ]
   },

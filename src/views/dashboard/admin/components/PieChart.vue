@@ -6,6 +6,7 @@
 import echarts from 'echarts'
 require('echarts/theme/macarons') // echarts theme
 import resize from './mixins/resize'
+import vemecServices from '@/api/vemecServices'
 
 export default {
   mixins: [resize],
@@ -25,13 +26,12 @@ export default {
   },
   data() {
     return {
+      lista: null,
       chart: null
     }
   },
   mounted() {
-    this.$nextTick(() => {
-      this.initChart()
-    })
+    this.getData();
   },
   beforeDestroy() {
     if (!this.chart) {
@@ -41,7 +41,23 @@ export default {
     this.chart = null
   },
   methods: {
-    initChart() {
+    async getData(){
+      await vemecServices.services.getCountAllByEstado()
+      .then(response =>{
+        this.lista = response.data;
+        this.initChart(this.lista);
+      })
+      .catch(err => {
+        this.$notify({
+          title: 'Error',
+          message: 'Ocurrió un error',
+          type: 'error',
+          duration: 3000
+        })
+      })
+    },
+
+    initChart(lista) {
       this.chart = echarts.init(this.$el, 'macarons')
 
       this.chart.setOption({
@@ -52,21 +68,24 @@ export default {
         legend: {
           left: 'center',
           bottom: '10',
-          data: ['Industries', 'Technology', 'Forex', 'Gold', 'Forecasts']
+          data: ['Estable', 'Sano', 'Intermedio', 'Critico', 'Difunto']
         },
+        color:[// sano , estable , intermedio , critico , difunto
+          '#34CD59','#0B9AE7','#DADF34','#FBB90A','#D32803',
+        ],
         series: [
           {
-            name: 'WEEKLY WRITE ARTICLES',
+            name: 'Estados de los contagiados',
             type: 'pie',
             roseType: 'radius',
-            radius: [15, 95],
+            radius: [10, 68],
             center: ['50%', '38%'],
             data: [
-              { value: 320, name: 'Industries' },
-              { value: 240, name: 'Technology' },
-              { value: 149, name: 'Forex' },
-              { value: 100, name: 'Gold' },
-              { value: 59, name: 'Forecasts' }
+              { value: this.lista.cant_sano, name: 'Sano' },
+              { value: this.lista.cant_estable, name: 'Estable' },
+              { value: this.lista.cant_intermedio, name: 'Intermedio' },
+              { value: this.lista.cant_critico, name: 'Critico' },
+              { value: this.lista.cant_difunto, name: 'Difunto' }
             ],
             animationEasing: 'cubicInOut',
             animationDuration: 2600

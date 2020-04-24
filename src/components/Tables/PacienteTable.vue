@@ -40,13 +40,20 @@
 
       <el-table-column label="Nombre" align="center" min-width="100px">
         <template slot-scope="{row}">
-          <span>{{ row.nombre }}</span>
+          <span> {{ row.nombre }}</span>
         </template>
       </el-table-column>
 
       <el-table-column label="Apellido" align="center">
         <template slot-scope="{row}">
           <span>{{ row.apellido }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="Sexo" align="center"  width="70px">
+        <template slot-scope="{row}">
+          <span v-if="row.sexo == 'MASCULINO'">M</span>
+          <span v-else>F</span>
         </template>
       </el-table-column>
 
@@ -111,6 +118,19 @@
 
         <el-form-item label="Apellido" prop="apellido">
           <el-input v-model="paciente.apellido" />
+        </el-form-item>
+
+        <el-form-item>
+          <el-form-item label="Sexo" prop="sexo">
+            <el-select v-model="paciente.sexo" placeholder="Seleccionar">
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
         </el-form-item>
 
         <el-form-item label="Edad" prop="edad">
@@ -189,10 +209,18 @@ export default {
         nombre: '',
         apellido: '',
         edad:'',
+        sexo:'',
         patologias:[]
       },
       //datos para tags de patologias
       dynamicTags: [],
+      options: [{
+          value: 'option1',
+          label: 'Masculino'
+      },{
+          value: 'Option2',
+          label: 'Femenino'
+      }],
       inputVisible: false,
       inputValue: '',
     //
@@ -203,6 +231,7 @@ export default {
         nombre: null,
         apellido: null,
         edad: null,
+        sexo: null,
         sort: '+id'
       },
       codigos,
@@ -219,6 +248,7 @@ export default {
         nombre: [{ required: true, message: 'Debe ingresar un nombre', trigger: 'blur' }],
         apellido: [{ required: true, message: 'Debe ingresar un apellido', trigger: 'blur' }],
         edad: [{ required: true, message: 'Debe ingresar un edad', trigger: 'blur' }],
+        sexo: [{ required: true, message: 'Debe ingresar un sexo', trigger: 'blur' }],
       },
       downloadLoading: false
     }
@@ -240,7 +270,8 @@ export default {
         limit: this.listQuery.limit,
         nombre: this.listQuery.nombre,
         apellido: this.listQuery.apellido,
-        edad: this.listQuery.edad
+        edad: this.listQuery.edad,
+        sexo: this.listQuery.sexo
       }).then(response => {
         this.list = response.data[2]
         this.total = response.data[1]
@@ -288,7 +319,14 @@ export default {
                 nombre: this.paciente.nombre,
                 apellido: this.paciente.apellido,
                 edad: parseInt(this.paciente.edad),
-                patologias: this.paciente.patologias
+                patologias: this.paciente.patologias,
+            }
+          console.log(this.paciente.sexo + " SESO");
+            if(this.paciente.sexo == "option1"){
+              pacienteNuevo.sexo = "MASCULINO";
+            }
+            else{
+              pacienteNuevo.sexo = "FEMENINO";
             }
           vemecServices.services.createPaciente(pacienteNuevo).then(res => {
             this.list.push(res.data)
@@ -316,6 +354,7 @@ export default {
       this.paciente.nombre = row.nombre
       this.paciente.apellido = row.apellido
       this.paciente.edad = parseInt(row.edad)
+      this.paciente.sexo = row.sexo
 
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
@@ -332,6 +371,12 @@ export default {
             apellido: this.paciente.apellido,
             edad: parseInt(this.paciente.edad)
           }
+          if(this.paciente.sexo == "option1"){
+              pacienteModificado.sexo = "MASCULINO";
+            }
+            else{
+              pacienteModificado.sexo = "FEMENINO";
+            }
           vemecServices.services.updatePaciente(pacienteModificado, this.paciente.id)
             .then(response => {
               this.list.forEach((item, index) => {
@@ -340,6 +385,7 @@ export default {
                   this.list[index].nombre = response.data.nombre
                   this.list[index].apellido = response.data.apellido
                   this.list[index].edad = response.data.edad
+                  this.list[index].sexo = response.data.sexo
                 }
               })
               this.$notify({
@@ -398,8 +444,8 @@ export default {
     handleDownload() {
       this.downloadLoading = true
         import('@/vendor/Export2Excel').then(excel => {
-          const tHeader = ['Cedula', 'Nombre', 'Apellido', 'Edad']
-          const filterVal = ['cedula', 'nombre', 'apellido', 'edad']
+          const tHeader = ['Cedula', 'Nombre', 'Apellido', 'Edad', 'Sexo']
+          const filterVal = ['cedula', 'nombre', 'apellido', 'edad', 'sexo']
           const data = this.formatJson(filterVal)
           excel.export_json_to_excel({
             header: tHeader,
@@ -415,6 +461,7 @@ export default {
         nombre: '',
         apellido: '',
         edad: null,
+        sexo: null,
         patologias: []
       }
     },

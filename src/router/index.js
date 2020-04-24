@@ -73,7 +73,7 @@ export const constantRoutes = [
         path: 'dashboard',
         component: () => import('@/views/dashboard/index'),
         name: 'Dashboard',
-        meta: { title: 'Dashboard', icon: 'dashboard', affix: true, requiresAuth: true},
+        meta: { title: 'Dashboard', icon: 'hospitalColor', affix: true, requiresAuth: true},
       }
     ]
   },
@@ -86,7 +86,7 @@ export const constantRoutes = [
         path: '/centro',
         component: () => import('@/views/centro/centro'),
         name: 'Centro',
-        meta: { title: 'Centros', icon: 'international', affix: true, requiresAuth: true},
+        meta: { title: 'Centros', icon: 'hospital', affix: true, requiresAuth: true},
       }
     ]
   },
@@ -113,7 +113,7 @@ export const constantRoutes = [
         path: '/paciente',
         component: () => import('@/views/paciente/paciente'),
         name: 'Paciente',
-        meta: { title: 'Pacientes', icon: 'dashboard', affix: true, requiresAuth: true },
+        meta: { title: 'Pacientes', icon: 'i-registration', affix: true, requiresAuth: true },
       }
     ]
   },

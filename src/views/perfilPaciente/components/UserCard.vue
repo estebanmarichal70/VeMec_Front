@@ -33,7 +33,7 @@
           <div class="progress-item" >
             <ul>
               <li v-for="item in paciente.patologias.patologias" :key="item.key">
-                {{ item }}
+                {{ item.charAt(0).toUpperCase() + item.slice(1) }}
               </li>
             </ul>
           </div>
@@ -60,9 +60,6 @@ export default {
       }
     },
     paciente:''
-  },
-  mounted() {
-    console.log(this.paciente);
   }
 }
 

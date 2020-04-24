@@ -97,6 +97,18 @@ module.exports = {
       addDefaultHeaders();
       return axios.get(apiUrl + `/ingreso/sala/${id}`)
     },
+    createIngreso(data){
+      addDefaultHeaders();
+      return axios.post(apiUrl + `/ingreso`, data);
+    },
+    PSVIngreso(id){
+      addDefaultHeaders();
+      return axios.get(apiUrl + `/ingreso/ingPSV/${id}`)
+    },
+    updateIngreso(data, id) {
+      addDefaultHeaders();
+      return axios.put(apiUrl + `/ingreso/${id}`, data)
+    },
     getIngresos({ page, limit, causa, id }) {
       addDefaultHeaders();
       return axios.get(apiUrl + `/ingreso?page=${page}&limit=${limit}&causa=${causa}&id=${id}`)
@@ -121,10 +133,6 @@ module.exports = {
     deleteReporte(id) {
       addDefaultHeaders();
       return axios.delete(apiUrl + `/reporte/${id}`)
-    },
-    createIngreso(data){
-      addDefaultHeaders();
-      return axios.post(apiUrl + `/ingreso`, data);
     }
   }
 }

@@ -337,9 +337,9 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          var hoy = new Date();
-          var fecha = (hoy.getDate() + '-' + (hoy.getMonth() +1) + '-' + hoy.getFullYear());
-          var hora = hoy.getHours() + ':' + hoy.getMinutes() + ':' + hoy.getSeconds();
+          let hoy = new Date();
+          let fecha = (hoy.getFullYear() + '-' + (hoy.getMonth() +1) + '-' + hoy.getDate());
+          let hora = hoy.getHours() + ':' + hoy.getMinutes() + ':' + hoy.getSeconds();
           const reporteNuevo = {
               presionMaxima: parseFloat(this.reporte.presionMaxima.toFixed(2)),
               presionMinima: parseFloat(this.reporte.presionMinima.toFixed(2)),
@@ -404,9 +404,9 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          var hoy = new Date();
-          var fecha = (hoy.getDate() + '-' + (hoy.getMonth() +1) + '-' + hoy.getFullYear());
-          var hora = hoy.getHours() + ':' + hoy.getMinutes() + ':' + hoy.getSeconds();
+          let hoy = new Date();
+          let fecha = (hoy.getDate() + '-' + (hoy.getMonth() +1) + '-' + hoy.getFullYear());
+          let hora = hoy.getHours() + ':' + hoy.getMinutes() + ':' + hoy.getSeconds();
           const reporteModificado = {
               presionMaxima: parseFloat(this.reporte.presionMaxima.toFixed(2)),
               presionMinima: parseFloat(this.reporte.presionMinima.toFixed(2)),

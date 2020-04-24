@@ -1,16 +1,35 @@
 <template>
 <div>
-  <el-button type="primary" @click="dialogIngreso = true, active = 0, clear(), centro = ''" round>Añadir Ingreso</el-button>
+
+  <el-card class="box-card" shadow="hover">
+  <div slot="header" class="clearfix">
+    <span>Estado del paciente</span>
+  </div>
+  <div>
+      <el-button type="primary" v-if="addIng" @click="dialogIngreso = true, active = 0, clear(), centro = ''" round>Añadir Ingreso</el-button>
+       <el-popconfirm
+            confirmButtonText='Si, eliminar'
+            confirmButtonType='danger'
+            cancelButtonText='No, cancelar'
+            cancelButtonType='primary'
+            icon="el-icon-info"
+            iconColor="red"
+            @onConfirm = updateIngreso()
+            title="Estas seguro que quieres dar de baja?"
+          >
+            <el-button type="danger" v-if="!addIng" slot="reference" round>Dar ingreso de baja</el-button>
+          </el-popconfirm>
+  </div>
+  </el-card>
 
   <el-dialog title="Añadir Ingreso" width="40%" :visible.sync="dialogIngreso">
-      <el-form
-        ref="dataForm"
-        :rules="rules"
-        :model="ingreso"
-        label-position="top"
-        
-      >
-
+          <el-form
+            ref="dataForm"
+            :rules="rules"
+            :model="ingreso"
+            label-position="top"
+            
+          >
     <el-steps :active="active" finish-status="success" style="margin-bottom: 15px;">
       <el-step title="Paso 1"></el-step>
       <el-step title="Paso 2"></el-step>
@@ -92,7 +111,7 @@
           Confirmar
         </el-button>
       </div>
-    </el-dialog>
+  </el-dialog>
 </div>
 </template>
 
@@ -118,16 +137,18 @@ export default {
   },
   data(){
     return{
+      ingresoUpdate: null,
+      addIng: true,
       active: 0,
       disable: true,
       disableV: true,
       disableC: true,
-      pacId: null,
       centro: '',
       centros: [],
       salas: [],
       vemecs: [],
       listLoading: false,
+      ingresos: [],
       ingreso: {
         causa: '',
         estado: '',
@@ -159,8 +180,10 @@ export default {
     }
   },
   created(){
+    this.ingresos = this.paciente.ingresos;
     this.ingreso.paciente = this.paciente.id;
-    this.handleInfo()
+    this.handleInfo();
+    this.verificarIngreso();
   },
   methods: {
       next() {
@@ -218,6 +241,7 @@ export default {
                   type: 'success',
                   duration: 3000
                 })
+                this.addIng = false;
               }).catch(err => {
                 this.$notify({
                   title: 'Error',
@@ -228,6 +252,47 @@ export default {
               })
             }
         })
+      },
+      async updateIngreso(){
+          let hoy = new Date();
+          let fecha = (hoy.getFullYear() + '-' + (hoy.getMonth() +1) + '-' + hoy.getDate());
+          let hora = hoy.getHours() + ':' + hoy.getMinutes() + ':' + hoy.getSeconds();
+          
+          let fechaIng = new Date(this.ingresoUpdate.fechaIngreso).toISOString().slice(0, 19).replace('T', ' ');
+        
+          await vemecServices.services.PSVIngreso(this.ingresoUpdate.id)
+            .then(response => {
+              let PSV = response.data;
+              const ingreso = {
+                  causa: this.ingresoUpdate.causa,
+                  estado: this.ingresoUpdate.estado,
+                  fechaEgreso: fecha +" "+ hora,
+                  fechaIngreso: fechaIng,
+                  paciente: PSV[0].id,
+                  sala: PSV[1].id,
+                  vemec: PSV[2].id
+                }
+              console.log(ingreso)
+              vemecServices.services.updateIngreso(ingreso, this.ingresoUpdate.id)
+                .then(res => {
+                  this.$notify({
+                    title: 'Éxito',
+                    message: 'Se actualizó el centro correctamente',
+                    type: 'success',
+                    duration: 3000
+                  })
+                  this.addIng = true;
+                }).catch(err => {
+                  this.$notify({
+                    title: 'Error',
+                    message: 'Ocurrió un error al actualizar',
+                    type: 'error',
+                    duration: 3000
+                  })
+                })
+            }).catch(err => console.log(err))
+
+
       },
       async handleInfo(){
         this.listLoading = true;
@@ -267,7 +332,7 @@ export default {
             this.disable = true;
             this.$notify({
               title: 'Error',
-              message: 'Este centro no contiene VeMecs',
+              message: 'Este centro no contiene VeMecs disponibles',
               type: 'error',
               duration: 3000
             })
@@ -284,6 +349,14 @@ export default {
         }).catch(err => console.log(err))
         this.listLoading = false;
         this.disableV = false;
+    },
+    verificarIngreso(){
+      this.ingresos.forEach((item)=>{
+        if(!item.fechaEgreso){
+            this.ingresoUpdate = item;
+            this.addIng = false;
+        }
+      })
     }
   }
 }

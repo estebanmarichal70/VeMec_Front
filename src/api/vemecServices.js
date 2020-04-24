@@ -117,6 +117,9 @@ module.exports = {
       addDefaultHeaders();
       return axios.get(apiUrl + `/ingreso/${id}`)
     },
+    getCountAllByEstado(){
+      return axios.get(apiUrl + `/ingreso/cnt_by_estado`)
+    },
     // reportes
     getReportes({page, limit, id}) {
       addDefaultHeaders();

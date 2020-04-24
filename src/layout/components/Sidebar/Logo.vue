@@ -2,12 +2,18 @@
   <div class="sidebar-logo-container" :class="{'collapse':collapse}">
     <transition name="sidebarLogoFade">
       <router-link v-if="collapse" key="collapse" class="sidebar-logo-link" to="/">
-        <img v-if="logo" :src="logo" class="sidebar-logo">
-        <h1 v-else class="sidebar-title">Vemec Manager</h1>
+        <div class="card-panel-icon-wrapper icon-hospital">
+          <svg-icon icon-class="hospitalColor" class="sidebar-logo" />
+          <h1 class="sidebar-title">Vemec Manager</h1>
+        </div>
+        
       </router-link>
       <router-link v-else key="expand" class="sidebar-logo-link" to="/">
-        <img v-if="logo" :src="logo" class="sidebar-logo">
-        <h1 class="sidebar-title">Vemec Manager</h1>
+        <div class="card-panel-icon-wrapper icon-masculino">
+          <svg-icon icon-class="hospitalColor" class="sidebar-logo" />
+          <h1 class="sidebar-title">Vemec Manager</h1>
+        </div>
+        
       </router-link>
     </transition>
   </div>

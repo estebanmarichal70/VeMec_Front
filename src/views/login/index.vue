@@ -54,7 +54,7 @@
 </template>
 
 <script>
-  import {mapGetters} from "vuex";
+  import {mapGetters, mapActions} from "vuex";
 
   export default {
     name: 'Login',
@@ -113,6 +113,9 @@
       }
     },
     methods: {
+      ...mapActions({
+        loginAction: "user/login"
+      }),
       checkCapslock(e) {
         const {key} = e
         this.capsTooltip = key && key.length === 1 && (key >= 'A' && key <= 'Z')
@@ -130,22 +133,7 @@
       handleLogin() {
         this.$refs.loginForm.validate(valid => {
           if (valid) {
-            this.loading = true
-            this.$store.dispatch('user/login', this.loginForm)
-            console.log(this.$store.getters.loginError)
-            if(this.$store.getters.loginError){
-              this.loading = false;
-              this.$notify({
-                title: 'Ooops...',
-                message: 'Ah ocurrido un error.',
-                type: 'error',
-                duration: 3000
-              })
-            }else{
-              this.loading = false;
-              this.$router.push({path: this.redirect || '/', query: this.otherQuery})
-            }
-
+            this.login();
           } else {
             this.$notify({
               title: 'Error',
@@ -156,6 +144,25 @@
             return false
           }
         })
+      },
+      async login() {
+        this.loading = true
+
+        await this.loginAction(this.loginForm);
+
+        console.log(this.loginError);
+        if (this.loginError) {
+          this.loading = false;
+          this.$notify({
+            title: 'Ooops...',
+            message: 'Usuario o contraseña incorrecta.',
+            type: 'error',
+            duration: 3000
+          })
+        } else {
+          this.loading = false;
+          this.$router.push({path: this.redirect || '/', query: this.otherQuery})
+        }
       },
       getOtherQuery(query) {
         return Object.keys(query).reduce((acc, cur) => {

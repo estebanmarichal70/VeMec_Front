@@ -7,5 +7,6 @@ const getters = {
   token: state => state.user.token,
   errorLogs: state => state.errorLog.logs,
   access_token: state => state.user.access_token,
+  loginError: state => state.user.loginError
 }
 export default getters

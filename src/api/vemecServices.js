@@ -10,10 +10,10 @@ let addDefaultHeaders = () => {
 
 module.exports = {
   services: {
-    login(data){
+    login(data) {
       return axios.post(apiUrl + "/auth/sign_in", data);
     },
-    getCentros({ page, limit, codigo, nombre }) {
+    getCentros({page, limit, codigo, nombre}) {
       addDefaultHeaders();
       return axios.get(apiUrl + `/centro?page=${page}&limit=${limit}&codigo=${codigo}&nombre=${nombre}`)
     },
@@ -38,7 +38,7 @@ module.exports = {
       addDefaultHeaders();
       return axios.get(apiUrl + `/sala/${id}`)
     },
-    getSalas({ page, limit, nombre, centro }) {
+    getSalas({page, limit, nombre, centro}) {
       addDefaultHeaders();
       return axios.get(apiUrl + `/sala?page=${page}&limit=${limit}&nombre=${nombre}&centro=${centro}`)
     },
@@ -72,7 +72,7 @@ module.exports = {
       return axios.delete(apiUrl + `/vemec/${id}`)
     },
     // Acciones Pacientes
-    getPacientes({ page, limit, nombre, apellido }) {
+    getPacientes({page, limit, nombre, apellido}) {
       addDefaultHeaders();
       return axios.get(apiUrl + `/paciente?page=${page}&limit=${limit}&nombre=${nombre}&apellido=${apellido}`)
     },
@@ -93,15 +93,15 @@ module.exports = {
       return axios.delete(apiUrl + `/paciente/${id}`)
     },
     // ingresos
-    salaIngreso(id){
+    salaIngreso(id) {
       addDefaultHeaders();
       return axios.get(apiUrl + `/ingreso/sala/${id}`)
     },
-    createIngreso(data){
+    createIngreso(data) {
       addDefaultHeaders();
       return axios.post(apiUrl + `/ingreso`, data);
     },
-    PSVIngreso(id){
+    PSVIngreso(id) {
       addDefaultHeaders();
       return axios.get(apiUrl + `/ingreso/ingPSV/${id}`)
     },
@@ -109,7 +109,7 @@ module.exports = {
       addDefaultHeaders();
       return axios.put(apiUrl + `/ingreso/${id}`, data)
     },
-    getIngresos({ page, limit, causa, id }) {
+    getIngresos({page, limit, causa, id}) {
       addDefaultHeaders();
       return axios.get(apiUrl + `/ingreso?page=${page}&limit=${limit}&causa=${causa}&id=${id}`)
     },
@@ -118,7 +118,7 @@ module.exports = {
       return axios.get(apiUrl + `/ingreso/${id}`)
     },
     // reportes
-    getReportes({ page, limit, id }) {
+    getReportes({page, limit, id}) {
       addDefaultHeaders();
       return axios.get(apiUrl + `/reporte?page=${page}&limit=${limit}&id=${id}`)
     },
@@ -133,6 +133,11 @@ module.exports = {
     deleteReporte(id) {
       addDefaultHeaders();
       return axios.delete(apiUrl + `/reporte/${id}`)
+    },
+    // data for charts
+    contarPacientesPorSexo() {
+      addDefaultHeaders();
+      return axios.get(apiUrl + "/paciente/cnt_by_sexo");
     }
   }
 }

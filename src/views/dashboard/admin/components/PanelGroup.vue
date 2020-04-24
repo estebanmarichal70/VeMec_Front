@@ -35,7 +35,7 @@
           <div class="card-panel-text">
             Femenino
           </div>
-          <count-to :start-val="0" :end-val="9280" :duration="3200" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="cant_fem" :duration="3200" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -48,7 +48,7 @@
           <div class="card-panel-text">
             Masculino
           </div>
-          <count-to :start-val="0" :end-val="13600" :duration="3600" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="cant_masc" :duration="3600" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -58,14 +58,39 @@
 <script>
 import CountTo from 'vue-count-to'
 
+import vemecServices from "../../../../api/vemecServices";
+
 export default {
   components: {
     CountTo
   },
+  data(){
+    return{
+      cant_fem: null,
+      cant_masc: null
+    }
+  },
   methods: {
+    async contarPacientesPorSexo(){
+      await vemecServices.services.contarPacientesPorSexo()
+        .then(res => {
+          this.cant_fem = res.data.cant_femenino;
+          this.cant_masc = res.data.cant_masculino;
+      }).catch(err => {
+        this.$notify({
+          title: 'Ooops...',
+          message: 'Ah ocurrido un error inesperado.',
+          type: 'error',
+          duration: 3000
+        })
+      })
+    },
     handleSetLineChartData(type) {
       this.$emit('handleSetLineChartData', type)
     }
+  },
+  mounted() {
+    this.contarPacientesPorSexo();
   }
 }
 </script>

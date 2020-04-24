@@ -67,12 +67,13 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
+    redirect: '/inicio',
     children: [
       {
-        path: 'dashboard',
+        path: 'inicio',
         component: () => import('@/views/dashboard/index'),
-        name: 'Dashboard',
+        name: 'Inicio',
+        meta: { title: 'Inicio', icon: 'hospitalColor', affix: true, requiresAuth: true},
       }
     ]
   },
@@ -156,14 +157,16 @@ const createRouter = () => new Router({
 const router = createRouter()
 
 router.beforeEach((to, from, next) => {
-  if(to.matched.some(record => record.meta.requiresAuth)) {
-    if (localStorage.getItem('access_token') == null) {
+  if(to.matched.some(record => {
+    return record.meta.requiresAuth
+  })) {
+    if (localStorage.getItem('access_token') == null || localStorage.getItem('access_token') == "null") {
       next({
         path: '/login',
         params: { nextUrl: to.fullPath }
       })
     } else {
-      console.log("access token existe")
+      console.log(localStorage.getItem('access_token'));
       let user = JSON.parse(localStorage.getItem('user'))
       if(to.matched.some(record => record.meta.is_admin)) {
         if(user.is_admin == 1){

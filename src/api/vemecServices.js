@@ -141,6 +141,10 @@ module.exports = {
     contarPacientesPorSexo() {
       addDefaultHeaders();
       return axios.get(apiUrl + "/paciente/cnt_by_sexo");
+    },
+    contarPacientesPorEdad(){
+      addDefaultHeaders();
+      return axios.get(apiUrl + "/paciente/cnt_by_edad");
     }
   }
 }

@@ -1,110 +1,290 @@
 <template>
-  <p></p>
+<div>
+  <el-button type="primary" @click="dialogIngreso = true, active = 0, clear(), centro = ''" round>Añadir Ingreso</el-button>
+
+  <el-dialog title="Añadir Ingreso" width="40%" :visible.sync="dialogIngreso">
+      <el-form
+        ref="dataForm"
+        :rules="rules"
+        :model="ingreso"
+        label-position="top"
+        
+      >
+
+    <el-steps :active="active" finish-status="success" style="margin-bottom: 15px;">
+      <el-step title="Paso 1"></el-step>
+      <el-step title="Paso 2"></el-step>
+      <el-step title="Paso 3"></el-step>
+    </el-steps>
+        <el-form-item v-if="active===0">
+          <el-form-item label="Centros" prop="centros">
+            <el-select v-model="centro" placeholder="Seleccionar" @change="handleChangeSala()">
+              <el-option
+                v-for="item in centros"
+                :key="item.id"
+                :label="item.nombre"
+                :value="item.id"
+              />
+            </el-select>
+          </el-form-item>
+        </el-form-item>
+
+        <el-form-item v-if="active===1">
+          <el-form-item label="Salas" prop="salas">
+            <el-select v-model="ingreso.sala" placeholder="Seleccionar" @change="handleChangeVemecs()">
+              <el-option
+                v-for="item in salas"
+                :key="item.id"
+                :label="item.nombre"
+                :value="item.id"
+              />
+            </el-select>
+          </el-form-item>
+        </el-form-item>
+
+      <div v-if="active===2">
+        <el-form-item >
+          <el-form-item label="VeMecs" prop="vemec">
+            <el-select v-model="ingreso.vemec" placeholder="Seleccionar">
+              <el-option
+                v-for="item in vemecs"
+                :key="item.id"
+                :label="item.nombre"
+                :value="item.id"
+              />
+            </el-select>
+          </el-form-item>
+        </el-form-item>
+
+        <el-form-item label="Causa" prop="causa">
+          <el-input v-model="ingreso.causa" />
+        </el-form-item>
+        
+        <el-form-item label="Fecha y Hora">
+          <el-date-picker
+            v-model="ingreso.fechaIngreso"
+            type="datetime"
+            placeholder="Seleccionar">
+          </el-date-picker>
+        </el-form-item>
+
+        <el-form-item >
+          <el-form-item label="Estado" prop="estado">
+            <el-select v-model="ingreso.estado" placeholder="Seleccionar">
+              <el-option
+                v-for="item in estados"
+                :key="item.id"
+                :label="item.nombre"
+                :value="item.id"
+              />
+            </el-select>
+          </el-form-item>
+        </el-form-item>
+      </div>
+      <div align="center">
+        <el-button type="primary" style="margin-top: 12px;" @click="back" round>Atras</el-button>
+        <el-button type="primary" style="margin-top: 12px;" @click="next" round :disabled="disable" v-if="active===0">Siguiente</el-button>
+        <el-button type="primary" style="margin-top: 12px;" @click="next" round :disabled="disableV" v-if="active===1">Siguiente</el-button>
+      </div>
+      </el-form>  
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="crearIngreso()" :disabled="disableC">
+          Confirmar
+        </el-button>
+      </div>
+    </el-dialog>
+</div>
 </template>
 
 <script>
 const avatarPrefix = '?imageView2/1/w/80/h/80'
 const carouselPrefix = '?imageView2/2/h/440'
 
+import vemecServices from '@/api/vemecServices'
+
 export default {
   props: [
     'paciente'
   ],
-  data(){
-    return{
-      ingresos: null
+  filters: {
+    statusFilter(status) {
+      const statusMap = {
+        published: 'success',
+        draft: 'info',
+        deleted: 'danger'
+      }
+      return statusMap[status]
     }
   },
-  mounted(){
-    //this.paciente.ingresos.forEach(item => console.log(item.historial));
-    //viene un objeto vacio????
-    
-    this.historial = this.paciente.ingresos;
-    
+  data(){
+    return{
+      active: 0,
+      disable: true,
+      disableV: true,
+      disableC: true,
+      pacId: null,
+      centro: '',
+      centros: [],
+      salas: [],
+      vemecs: [],
+      listLoading: false,
+      ingreso: {
+        causa: '',
+        estado: '',
+        fechaEgreso: '',
+        fechaIngreso: '',
+        paciente: '',
+        sala: '',
+        vemec: ''
+      },
+      dialogIngreso: false,
+      rules: {
+        vemec: [{ required: true, message: 'Debe ingresar un VeMec', trigger: 'blur' }],
+        causa: [{ required: true, message: 'Debe ingresar una causa', trigger: 'blur' }],
+        estado: [{ required: true, message: 'Debe ingresar un estado', trigger: 'blur' }]
+      },
+      estados: [{
+          id: 'CRITICO',
+          nombre: 'Critico'
+        },{
+          id: "INTERMEDIO",
+          nombre: 'Intermedio'
+        },{
+          id: "ESTABLE",
+          nombre: 'Estable'
+        },{
+          id: "SANO",
+          nombre: 'Sano'
+      }]
+    }
+  },
+  created(){
+    this.ingreso.paciente = this.paciente.id;
+    this.handleInfo()
+  },
+  methods: {
+      next() {
+        if(this.active === 0){
+          this.disableV = true;
+        }
+        if(this.active === 1){
+          this.disableC = false;
+        }
+        if (this.active <= 1){
+            this.active++;
+        }
+      },
+      back() {
+        if(this.active === 1){
+          this.ingreso.sala = '';
+        }
+        if(this.active === 2){
+          this.clear();
+          this.disableV = true;
+          this.disableC = true;
+        }
+        if (this.active >= 1)
+          this.active--;
+      },
+      clear(){
+        this.ingreso.causa = '';
+        this.ingreso.estado = '';
+        this.ingreso.fechaEgreso = '';
+        this.ingreso.fechaIngreso = '';
+        this.ingreso.sala = '';
+        this.ingreso.vemec = '';
+        this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+      },
+      crearIngreso(){
+          this.$refs['dataForm'].validate((valid) => {
+            if (valid) { 
+              let fecha = this.ingreso.fechaIngreso.toJSON().slice(0, 19).replace('T', ' ');
+              const ingreso = {
+                causa: this.ingreso.causa,
+                estado: this.ingreso.estado,
+                fechaEgreso: null,
+                fechaIngreso: fecha,
+                paciente: this.ingreso.paciente,
+                sala: this.ingreso.sala,
+                vemec: this.ingreso.vemec
+              }
+              vemecServices.services.createIngreso(ingreso).then(res => {
+                this.dialogIngreso = false
+                this.$notify({
+                  title: 'Éxito',
+                  message: 'Se creó el ingreso correctamente',
+                  type: 'success',
+                  duration: 3000
+                })
+              }).catch(err => {
+                this.$notify({
+                  title: 'Error',
+                  message: 'Ocurrió un error al crear',
+                  type: 'error',
+                  duration: 3000
+                })
+              })
+            }
+        })
+      },
+      async handleInfo(){
+        this.listLoading = true;
+        await vemecServices.services.getCentros({
+          page: 1,
+          limit: 99999999,
+          nombre: null,
+          codigo: null
+        }).then(response => {
+          let temp = response.data[2];
+          temp.forEach((item, index) =>{
+            if(Object.keys(item.salas).length){
+              this.centros.push(item);
+            }
+          })
+        }).catch(err => console.log(err))
+        this.listLoading = false;
+      },
+      async handleChangeSala() {
+        this.listLoading = true
+        await vemecServices.services.getSalas({
+          page: 1,
+          limit: 99999999,
+          nombre: null,
+          centro: parseInt(this.centro)
+        }).then(response => {
+          this.salas = [];
+          let temp = response.data[2];
+          temp.forEach((item, index) =>{
+            if(Object.keys(item.vemecs).length){
+              this.salas.push(item);
+            }
+          })
+          if(this.salas.length){
+            this.disable = false;
+          }else{
+            this.disable = true;
+            this.$notify({
+              title: 'Error',
+              message: 'Este centro no contiene VeMecs',
+              type: 'error',
+              duration: 3000
+            })
+          }
+        }).catch(err => console.log(err))
+        this.listLoading = false
+      },
+      async handleChangeVemecs() {
+        this.disableV = false;
+        this.listLoading = true;
+        await vemecServices.services.getSalaByID(parseInt(this.ingreso.sala))
+        .then(response => {
+          this.vemecs = response.data.vemecs;
+        }).catch(err => console.log(err))
+        this.listLoading = false;
+        this.disableV = false;
+    }
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.user-activity {
-  .user-block {
-
-    .username,
-    .description {
-      display: block;
-      margin-left: 50px;
-      padding: 2px 0;
-    }
-
-    .username{
-      font-size: 16px;
-      color: #000;
-    }
-
-    :after {
-      clear: both;
-    }
-
-    .img-circle {
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      float: left;
-    }
-
-    span {
-      font-weight: 500;
-      font-size: 12px;
-    }
-  }
-
-  .post {
-    font-size: 14px;
-    border-bottom: 1px solid #d2d6de;
-    margin-bottom: 15px;
-    padding-bottom: 15px;
-    color: #666;
-
-    .image {
-      width: 100%;
-      height: 100%;
-
-    }
-
-    .user-images {
-      padding-top: 20px;
-    }
-  }
-
-  .list-inline {
-    padding-left: 0;
-    margin-left: -5px;
-    list-style: none;
-
-    li {
-      display: inline-block;
-      padding-right: 5px;
-      padding-left: 5px;
-      font-size: 13px;
-    }
-
-    .link-black {
-
-      &:hover,
-      &:focus {
-        color: #999;
-      }
-    }
-  }
-
-}
-
-.box-center {
-  margin: 0 auto;
-  display: table;
-}
-
-.text-muted {
-  color: #777;
-}
-</style>

@@ -150,7 +150,6 @@
 
         await this.loginAction(this.loginForm);
 
-        console.log(this.loginError);
         if (this.loginError) {
           this.loading = false;
           this.$notify({

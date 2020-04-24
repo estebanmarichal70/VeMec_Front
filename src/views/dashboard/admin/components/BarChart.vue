@@ -102,7 +102,7 @@
           .catch(err => {
             this.$notify({
               title: 'Ooops...',
-              message: 'Ah ocurrido un error inesperado.',
+              message: 'Ha ocurrido un error inesperado.',
               type: 'error',
               duration: 3000
             })

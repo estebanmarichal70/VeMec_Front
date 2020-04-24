@@ -142,6 +142,14 @@ module.exports = {
     contarPacientesPorEdad(){
       addDefaultHeaders();
       return axios.get(apiUrl + "/paciente/cnt_by_edad");
+    },
+    contarVemecs(){
+      addDefaultHeaders();
+      return axios.get(apiUrl + "/vemec/cnt_by_estado");
+    },
+    contarIngresosHoy(){
+      addDefaultHeaders();
+      return axios.get(apiUrl + "/ingreso/ingresos_hoy");
     }
   }
 }

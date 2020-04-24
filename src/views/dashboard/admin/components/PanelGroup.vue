@@ -9,7 +9,7 @@
           <div class="card-panel-text">
             Pacientes
           </div>
-          <count-to :start-val="0" :end-val="102400" :duration="2600" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="ingresosHoy" :duration="2600" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -20,9 +20,12 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            CoVid
+            Vemecs Libres
           </div>
-          <count-to :start-val="0" :end-val="81212" :duration="3000" class="card-panel-num" />
+          <count-to v-if="vemecs.libres > 0" :start-val="0" :end-val="vemecs.libres" :duration="3000" class="card-panel-num" />
+          <div v-if="vemecs.libres == 0" class="card-panel-num" >
+            Ninguno libre
+          </div>
         </div>
       </div>
     </el-col>
@@ -67,11 +70,14 @@ export default {
   data(){
     return{
       cant_fem: null,
-      cant_masc: null
+      cant_masc: null,
+      vemecs: {},
+      pacientes: null,
+      ingresosHoy: null
     }
   },
   methods: {
-    async contarPacientesPorSexo(){
+    async getData(){
       await vemecServices.services.contarPacientesPorSexo()
         .then(res => {
           this.cant_fem = res.data.cant_femenino;
@@ -84,13 +90,37 @@ export default {
           duration: 3000
         })
       })
+
+      await vemecServices.services.contarVemecs()
+        .then(res => {
+          this.vemecs = {...res.data};
+        }).catch(err => {
+          this.$notify({
+            title: 'Ooops...',
+            message: 'Ah ocurrido un error inesperado.',
+            type: 'error',
+            duration: 3000
+          })
+        })
+
+      await vemecServices.services.contarIngresosHoy()
+        .then(res => {
+          this.ingresosHoy = res.data;
+        }).catch(err => {
+          this.$notify({
+            title: 'Ooops...',
+            message: 'Ah ocurrido un error inesperado.',
+            type: 'error',
+            duration: 3000
+          })
+        })
     },
     handleSetLineChartData(type) {
       this.$emit('handleSetLineChartData', type)
     }
   },
   mounted() {
-    this.contarPacientesPorSexo();
+    this.getData();
   }
 }
 </script>

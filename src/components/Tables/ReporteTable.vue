@@ -1,13 +1,6 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.causa" placeholder="" style="width: 280px;" class="filter-item"
-                @input="handleFilter"/>
-
-      <!--<el-select @change="handleFilter()" v-model="listQuery.codigo" placeholder="Codigo" clearable class="filter-item" style="width: 130px">
-        <el-option v-for="item in codigos" :key="item.key" :label="item.key" :value="item.key"/>
-      </el-select>-->
-      
       <el-button class="filter-item" type="primary" icon="el-icon-edit" @click="handleCreate">
         Añadir
       </el-button>
@@ -23,7 +16,7 @@
         Exportar a Excel
       </el-button>
 
-      <el-button slot="reference" size="mini" type="success" @click="getListGrafica(), dialogGrafica = true" >
+      <el-button :disabled="grafica" class="filter-item" type="danger" @click="getListGrafica(), dialogGrafica = true" >
         Ver Grafica
       </el-button>
 
@@ -252,6 +245,7 @@ export default {
       tableKey: 0,
       list: null,
       total: 0,
+      grafica:true,
       listLoading: true,
       rowToDelete: null,
       indexToDelete: null,
@@ -319,6 +313,14 @@ export default {
         limit: this.listQuery.limit,
         id: parseInt(this.ingresoID)
       }).then(response => {
+        console.log(response.data[2].length);
+        if(response.data[2].length >= 2){
+          this.grafica = false;
+        }
+        else{
+          this.grafica = true;
+        }
+        
         this.list = response.data[2]
         this.total = response.data[1]
       }).catch(err => console.log(err))
@@ -403,6 +405,9 @@ export default {
             this.list.push(res.data)
             this.dialogFormVisible = false
             this.total++
+            if(this.total >= 2){
+               this.grafica = false;
+            }
             this.$notify({
               title: 'Éxito',
               message: 'Se creó el reporte correctamente',

@@ -103,7 +103,7 @@ export default {
           })
         })
 
-      await vemecServices.services.contarIngresosHoy()
+      await vemecServices.services.contarPacientes()
         .then(res => {
           this.ingresosHoy = res.data;
         }).catch(err => {

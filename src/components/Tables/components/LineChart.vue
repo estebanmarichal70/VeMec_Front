@@ -48,8 +48,6 @@ export default {
     this.$nextTick(() => {
       this.initChart()
     })
-    console.log("mounted grafica");
-    console.log(this.chartData);
   },
   beforeDestroy() {
     if (!this.chart) {

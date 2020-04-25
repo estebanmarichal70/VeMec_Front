@@ -157,6 +157,10 @@ module.exports = {
     contarIngresosHoy(){
       addDefaultHeaders();
       return axios.get(apiUrl + "/ingreso/ingresos_hoy");
-    }
+    },
+    contarPacientes(){
+      addDefaultHeaders();
+      return axios.get(apiUrl + "/ingreso/total");
+    },
   }
 }

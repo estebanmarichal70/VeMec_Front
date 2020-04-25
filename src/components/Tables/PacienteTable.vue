@@ -109,7 +109,7 @@
       >
 
         <el-form-item label="Cedula" prop="id">
-          <el-input v-model="paciente.id" />
+          <el-input type="number" v-model="paciente.id" />
         </el-form-item>
 
         <el-form-item label="Nombre" prop="nombre">
@@ -134,7 +134,7 @@
         </el-form-item>
 
         <el-form-item label="Edad" prop="edad">
-          <el-input v-model="paciente.edad" />
+          <el-input type="number" v-model="paciente.edad" />
         </el-form-item>
 
         <el-form-item label="Patologias">
@@ -349,6 +349,7 @@ export default {
       })
     },
     handleUpdate(row) {
+      this.resetPaciente()
       this.paciente.id = parseInt(row.id)
       this.paciente.nombre = row.nombre
       this.paciente.apellido = row.apellido

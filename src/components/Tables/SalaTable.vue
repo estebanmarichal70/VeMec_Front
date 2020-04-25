@@ -197,16 +197,6 @@
         <el-form-item label="Modelo" prop="modelo">
           <el-input v-model="vemec.modelo" />
         </el-form-item>
-        <el-form-item label="Estado" prop="estado">
-          <el-select v-model="vemec.estado" placeholder="Seleccione el estado">
-            <el-option
-              v-for="item in opciones"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </el-form-item>   
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogVemec = false">
@@ -268,13 +258,6 @@ export default {
         modelo: '',
         estado: false,
       },
-      opciones: [{
-          value: false,
-          label: 'Desocupado'
-        }, {
-          value: true,
-          label: 'Ocupado'
-        }],
       value: false,
       listQuery: {
         page: 1,
@@ -300,8 +283,7 @@ export default {
       },
       rulesV: {
         marca: [{ required: true, message: 'Debe ingresar una marca', trigger: 'blur' }],
-        modelo: [{ required: true, message: 'Debe ingresar un modelo', trigger: 'blur' }],
-        estado: [{ required: true, message: 'Debe ingresar un estado', trigger: 'blur' }]
+        modelo: [{ required: true, message: 'Debe ingresar un modelo', trigger: 'blur' }]
       },
       downloadLoading: false
     }
@@ -455,7 +437,6 @@ export default {
       this.vemec.marca = row.marca
       this.vemec.modelo = row.modelo
       this.vemec.id = parseInt(row.id)
-      this.vemec.estado = row.estado
 
       this.dialogStatus = 'updateV'
       this.dialogVemec = true
@@ -513,7 +494,7 @@ export default {
                 if (item.id == response.data.id) {
                   this.listV[index].marca = response.data.marca
                   this.listV[index].modelo = response.data.modelo
-                  this.listV[index].estadi = response.data.estado
+                  this.listV[index].estado = response.data.estado
                 }
               })
               this.$notify({

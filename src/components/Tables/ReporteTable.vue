@@ -48,13 +48,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Presión Máxima" align="center" width="80px">
+      <el-table-column label="Presión Máxima" align="center" min-width="80px">
         <template slot-scope="{row}">
           <span>{{ row.presionMaxima + row.unidadPresion}}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Presión Mínima" align="center" min-width="80px">
+      <el-table-column label="Presión Mínima" align="center" min-width="85px">
         <template slot-scope="{row}">
           <span>{{ row.presionMinima + row.unidadPresion}}</span>
         </template>
@@ -96,13 +96,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Presion Entrada" align="center" min-width="80px">
+      <el-table-column label="Presión Entrada" align="center" min-width="85px">
         <template slot-scope="{row}">
           <span>{{ row.presionEntrada + row.unidadPresion}}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Presion Salida" align="center" min-width="80px">
+      <el-table-column label="Presión Salida" align="center" min-width="80px">
         <template slot-scope="{row}">
           <span>{{ row.presionSalida + row.unidadPresion}}</span>
         </template>
@@ -149,20 +149,19 @@
         style="width: 80%; margin-left: 40px"
       >
 
-        <el-form-item label="Presion Maxima" prop="pmax">
+        <el-form-item label="Presión Máxima/Mínima" prop="pmm">
             <el-input-number v-model="reporte.presionMaxima" :precision="2" :step="0.1"></el-input-number>
-        </el-form-item>
-
-        <el-form-item label="Presion Minima" prop="pmin">
             <el-input-number v-model="reporte.presionMinima" :precision="2" :step="0.1"></el-input-number>
         </el-form-item>
 
-        <el-form-item label="Presion Entrada" prop="pe">
+        <el-form-item label="Presión Entrada/Salida" prop="pe">
             <el-input-number v-model="reporte.presionEntrada" :precision="2" :step="0.1"></el-input-number>
+            <el-input-number v-model="reporte.presionSalida" :precision="2" :step="0.1"></el-input-number>
         </el-form-item>
 
-        <el-form-item label="Presion Salida" prop="ps">
-            <el-input-number v-model="reporte.presionSalida" :precision="2" :step="0.1"></el-input-number>
+        <el-form-item label="Temperatura Entrada/Salida" prop="te">
+            <el-input-number v-model="reporte.tempEntrada" :precision="2" :step="0.1"></el-input-number>
+            <el-input-number v-model="reporte.tempSalida" :precision="2" :step="0.1"></el-input-number>
         </el-form-item>
 
         <el-form-item label="Volumen Gas" prop="vg">
@@ -173,22 +172,13 @@
             <el-input-number v-model="reporte.frecGas" :precision="2" :step="0.1"></el-input-number>
         </el-form-item>
 
-        <el-form-item label="Mazcla" prop="m">
+        <el-form-item label="Mezcla" prop="m">
             <el-input-number v-model="reporte.mezcla" :precision="2" :step="0.1"></el-input-number>
         </el-form-item>
 
         <el-form-item label="Humedad Aire" prop="ha">
             <el-input-number v-model="reporte.humedadAire" :precision="2" :step="0.1"></el-input-number>
         </el-form-item>
-
-        <el-form-item label="Temperatura Entrada" prop="te">
-            <el-input-number v-model="reporte.tempEntrada" :precision="2" :step="0.1"></el-input-number>
-        </el-form-item>
-
-        <el-form-item label="Temperatura Salida" prop="ts">
-            <el-input-number v-model="reporte.tempSalida" :precision="2" :step="0.1"></el-input-number>
-        </el-form-item>
-
       </el-form>
       <div slot="footer" class="dialog-footer">
 

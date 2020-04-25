@@ -32,7 +32,7 @@
       @sort-change="sortChange"
     >
 
-      <el-table-column label="Cedula" align="center" width="100px">
+      <el-table-column label="Cédula" align="center" min-width="100px">
         <template slot-scope="{row}">
           <span>{{ row.id }}</span>
         </template>
@@ -44,36 +44,36 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Apellido" align="center">
+      <el-table-column label="Apellido" align="center" min-width="100px">
         <template slot-scope="{row}">
           <span>{{ row.apellido }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Sexo" align="center"  width="70px">
+      <el-table-column label="Sexo" align="center"  min-width="70px">
         <template slot-scope="{row}">
           <span v-if="row.sexo == 'MASCULINO'">M</span>
           <span v-else>F</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Edad" align="center">
+      <el-table-column label="Edad" align="center" min-width="70px">
         <template slot-scope="{row}">
           <span>{{ row.edad }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Informacion" align="center">
+      <el-table-column label="Información" align="center" min-width="140px">
         <template slot-scope="{row}">
           <router-link :to="`/perfil/${row.id}`">
             <el-button size="mini" type="success">
-              Ver Informacion
+              Ver Información
             </el-button>
           </router-link>
         </template>
       </el-table-column>
 
-      <el-table-column label="Acciones" align="center" width="230px">
+      <el-table-column label="Acciones" align="center" min-width="230px">
         <template slot-scope="{row,$index}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             Actualizar
@@ -108,7 +108,7 @@
         style="width: 80%; margin-left: 40px"
       >
 
-        <el-form-item label="Cedula" prop="id">
+        <el-form-item label="Cédula" prop="id">
           <el-input type="number" v-model="paciente.id" />
         </el-form-item>
 
@@ -137,7 +137,7 @@
           <el-input type="number" v-model="paciente.edad" />
         </el-form-item>
 
-        <el-form-item label="Patologias">
+        <el-form-item label="Patologías">
             <el-tag
             :key="tag"
             v-for="tag in paciente.patologias"
@@ -155,7 +155,7 @@
             @keyup.enter.native="handleInputConfirm"
             @blur="handleInputConfirm">
         </el-input>
-        <el-button v-else class="button-new-tag" size="small" @click="showInput">+ Nueva patologia</el-button>
+        <el-button v-else class="button-new-tag" size="small" @click="showInput">+ Nueva patología</el-button>
         </el-form-item>
 
       </el-form>
@@ -244,10 +244,10 @@ export default {
         create: 'Crear un nuevo paciente'
       },
       rules: {
-        id: [{ required: true, message: 'Debe ingresar una cedula', trigger: 'blur' }],
+        id: [{ required: true, message: 'Debe ingresar una cédula', trigger: 'blur' }],
         nombre: [{ required: true, message: 'Debe ingresar un nombre', trigger: 'blur' }],
         apellido: [{ required: true, message: 'Debe ingresar un apellido', trigger: 'blur' }],
-        edad: [{ required: true, message: 'Debe ingresar un edad', trigger: 'blur' }],
+        edad: [{ required: true, message: 'Debe ingresar una edad', trigger: 'blur' }],
         sexo: [{ required: true, message: 'Debe ingresar un sexo', trigger: 'blur' }],
       },
       downloadLoading: false

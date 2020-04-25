@@ -4,7 +4,7 @@
       <el-input v-model="listQuery.nombre" placeholder="Nombre de Centro" style="width: 250px;" class="filter-item"
                 @input="handleFilter"/>
 
-      <el-select @change="handleFilter()" v-model="listQuery.codigo" placeholder="Codigo" clearable class="filter-item" style="width: 130px">
+      <el-select @change="handleFilter()" v-model="listQuery.codigo" placeholder="Código" clearable class="filter-item" style="width: 130px">
         <el-option v-for="item in codigos" :key="item.key" :label="item.key" :value="item.key"/>
       </el-select>
       
@@ -48,7 +48,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Codigo" align="center" width="80px">
+      <el-table-column label="Código" align="center" min-width="80px">
         <template slot-scope="{row}">
           <span>{{ row.codigo }}</span>
         </template>
@@ -60,13 +60,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Direccion" align="center">
+      <el-table-column label="Dirección" align="center" min-width="100px">
         <template slot-scope="{row}">
           <span>{{ row.direccion }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Salas" align="center">
+      <el-table-column label="Salas" align="center" min-width="130px">
         <template slot-scope="{row}">
           <router-link :to="`/sala/${row.id}`">
             <el-button size="mini" type="success">
@@ -76,7 +76,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Acciones" align="center" width="230px">
+      <el-table-column label="Acciones" align="center" min-width="230px">
         <template slot-scope="{row,$index}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             Actualizar
@@ -128,7 +128,7 @@
           </el-form-item>
         </el-form-item>
 
-        <el-form-item label="Direccion" prop="direccion">
+        <el-form-item label="Dirección" prop="direccion">
           <el-input v-model="centro.direccion" />
         </el-form-item>
 
@@ -202,7 +202,7 @@ export default {
       },
       rules: {
         nombre: [{ required: true, message: 'Debe ingresar un nombre', trigger: 'blur' }],
-        direccion: [{ required: true, message: 'Debe ingresar una direccion', trigger: 'blur' }],
+        direccion: [{ required: true, message: 'Debe ingresar una dirección', trigger: 'blur' }],
         codigo: [{ required: true, message: 'Debe seleccionar un departamento', trigger: 'blur' }]
       },
       downloadLoading: false

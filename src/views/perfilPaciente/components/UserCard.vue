@@ -39,7 +39,7 @@
       </div>
 
       <div class="user-skills user-bio-section" >
-        <div class="user-bio-section-header"><svg-icon icon-class="skill" /><span>Patologias</span></div>
+        <div class="user-bio-section-header"><svg-icon icon-class="skill" /><span>Patologías</span></div>
         <div class="user-bio-section-body" v-if="paciente.patologias">
           <div class="progress-item" >
             <ul>

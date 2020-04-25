@@ -53,12 +53,12 @@
           <span>{{ row.capacidad }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="VeMecs" align="center">
+      <el-table-column label="VeMecs" align="center" min-width="130px">
         <template slot-scope="{row}">
-          <el-button slot="reference" type="success" @click="getVemecs(row), dialogMainVemec = true" >Lista de VeMecs</el-button>
+          <el-button slot="reference" size="mini" type="success" @click="getVemecs(row), dialogMainVemec = true" >Ver VeMecs</el-button>
         </template>
       </el-table-column>
-      <el-table-column label="Acciones" align="center" width="230px">
+      <el-table-column label="Acciones" align="center" min-width="230px">
         <template slot-scope="{row,$index}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             Actualizar

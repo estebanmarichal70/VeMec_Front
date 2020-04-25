@@ -54,8 +54,11 @@
               type: 'shadow'
             }
           },
+          title: {
+          text: "Pacientes ingresados por edad"
+          },
           grid: {
-            top: 10,
+            top: '20%',
             left: '2%',
             right: '2%',
             bottom: '3%',

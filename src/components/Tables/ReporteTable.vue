@@ -23,6 +23,10 @@
         Exportar a Excel
       </el-button>
 
+      <el-button slot="reference" size="mini" type="success" @click="getListGrafica(), dialogGrafica = true" >
+        Ver Grafica
+      </el-button>
+
     </div>
 
     <el-table
@@ -191,6 +195,18 @@
         </el-button>
       </div>
     </el-dialog>
+
+     <el-dialog title="Grafica de los ultimos reportes" align="center" width="70%" :visible.sync="dialogGrafica">
+        <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+          <line-chart :chart-data="lineChartData" />
+        </el-row>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogGrafica= false">
+          Atras
+        </el-button>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -202,10 +218,18 @@ import debounce from 'lodash.debounce'
 import vemecServices from '@/api/vemecServices'
 import codigos from '@/constants/codigos'
 import {convertirFecha} from '@/utils/index'
+import LineChart from './components/LineChart'
+
+/*const lineChartData = {
+  newVisitis: {
+    expected: this.expected,
+    actual: this.actual
+  }
+}*/
 
 export default {
   name: 'ComplexTable',
-  components: { Pagination },
+  components: { Pagination , LineChart },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -219,6 +243,12 @@ export default {
   },
   data() {
     return {
+      lineChartData: {
+        presionSalida:[],
+        presionEntrada:[],
+        fechas:[]
+      },
+      dialogGrafica: false,
       tableKey: 0,
       list: null,
       total: 0,
@@ -249,6 +279,7 @@ export default {
         causa: null,
         sort: '+id'
       },
+      listGrafica:'',
       importanceOptions: [1, 2, 3],
       sortOptions: [{ label: 'Ascendente', key: '+id' }, { label: 'Descendente', key: '-id' }],
       dialogFormVisible: false,
@@ -278,6 +309,9 @@ export default {
     this.getList()
   },
   methods: {
+     handleSetLineChartData(type) {
+      this.lineChartData = lineChartData[type]
+     },
     async getList() {
       this.listLoading = true
       await vemecServices.services.getReportes({
@@ -286,8 +320,27 @@ export default {
         id: parseInt(this.ingresoID)
       }).then(response => {
         this.list = response.data[2]
-        console.log(this.list);
         this.total = response.data[1]
+      }).catch(err => console.log(err))
+      this.listLoading = false
+    },
+    async getListGrafica() {
+      this.listLoading = true
+      this.lineChartData.fechas = [];
+      this.lineChartData.presionSalida = [];
+      this.lineChartData.presionEntrada = [];
+      await vemecServices.services.getReportes({
+        page: this.listQuery.page,
+        limit: 50,
+        id: parseInt(this.ingresoID)
+      }).then(response => {
+        this.listGrafica = response.data[2]
+        this.listGrafica.forEach(item => {
+         this.lineChartData.presionEntrada.push(item.presionEntrada);
+         this.lineChartData.presionSalida.push(item.presionSalida);
+         let fecha = this.parseFecha(item.time,'lll');
+         this.lineChartData.fechas.push(fecha);
+        })
       }).catch(err => console.log(err))
       this.listLoading = false
     },

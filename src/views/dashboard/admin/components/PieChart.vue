@@ -81,14 +81,14 @@ export default {
             name: 'Estados de los contagiados',
             type: 'pie',
             roseType: 'radius',
-            radius: [35, 100],
+            radius: [35, 85],
             center: ['50%', '38%'],
             data: [
               { value: this.lista.cant_sano, name: 'Sano' },
-              { value: this.lista.cant_estable, name: 'Estable' },
-              { value: this.lista.cant_intermedio, name: 'Intermedio' },
-              { value: this.lista.cant_critico, name: 'Critico' },
-              { value: this.lista.cant_difunto, name: 'Difunto' }
+              { value: this.lista.cant_estable ? this.lista.cant_estable : null, name: 'Estable' },
+              { value: this.lista.cant_intermedio ? this.lista.cant_intermedio : null, name: 'Intermedio' },
+              { value: this.lista.cant_critico ? this.lista.cant_critico : null, name: 'Critico' },
+              { value: this.lista.cant_difunto ? this.lista.cant_difunto : null, name: 'Difunto' }
             ],
             animationEasing: 'cubicInOut',
             animationDuration: 2600

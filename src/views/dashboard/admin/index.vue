@@ -3,17 +3,17 @@
 
     <panel-group @handleSetLineChartData="handleSetLineChartData" />
 
-    <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+    <!--<el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
       <line-chart :chart-data="lineChartData" />
-    </el-row>
+    </el-row>-->
 
     <el-row :gutter="32">
-      <el-col :xs="24" :sm="32" :lg="9">
+      <el-col>
         <div class="chart-wrapper">
           <pie-chart />
         </div>
       </el-col>
-      <el-col :xs="24" :sm="24" :lg="8">
+      <el-col >
         <div class="chart-wrapper">
           <bar-chart />
         </div>

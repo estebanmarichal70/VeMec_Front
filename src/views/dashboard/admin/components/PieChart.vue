@@ -61,6 +61,9 @@ export default {
       this.chart = echarts.init(this.$el, 'macarons')
 
       this.chart.setOption({
+        title: {
+          text: "Estado de los pacientes"
+        },
         tooltip: {
           trigger: 'item',
           formatter: '{a} <br/>{b} : {c} ({d}%)'
@@ -71,14 +74,14 @@ export default {
           data: ['Estable', 'Sano', 'Intermedio', 'Critico', 'Difunto']
         },
         color:[// sano , estable , intermedio , critico , difunto
-          '#34CD59','#0B9AE7','#DADF34','#FBB90A','#D32803',
+          '#34CD59','#0b9ae7','#DADF34','#fbb90a','#D32803',
         ],
         series: [
           {
             name: 'Estados de los contagiados',
             type: 'pie',
             roseType: 'radius',
-            radius: [10, 68],
+            radius: [35, 100],
             center: ['50%', '38%'],
             data: [
               { value: this.lista.cant_sano, name: 'Sano' },

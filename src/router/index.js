@@ -68,11 +68,13 @@ export const constantRoutes = [
     path: '/',
     component: Layout,
     redirect: '/inicio',
+    hidden: true,
     children: [
       {
         path: 'inicio',
         component: () => import('@/views/dashboard/index'),
         name: 'Inicio',
+        meta: { requiresAuth: true},
       }
     ]
   },

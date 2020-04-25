@@ -101,6 +101,10 @@ module.exports = {
       addDefaultHeaders();
       return axios.post(apiUrl + `/ingreso`, data);
     },
+    finalizarIngreso(data, id) {
+      addDefaultHeaders();
+      return axios.put(apiUrl + `/ingreso/finalizar/${id}`, data)
+    },
     PSVIngreso(id) {
       addDefaultHeaders();
       return axios.get(apiUrl + `/ingreso/ingPSV/${id}`)

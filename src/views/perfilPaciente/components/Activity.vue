@@ -7,17 +7,17 @@
   </div>
   <div>
       <el-button type="primary" v-if="addIng" @click="dialogIngreso = true, active = 0, clear(), centro = ''" round>Añadir Ingreso</el-button>
-       <el-popconfirm
+       <el-popconfirm v-if="!addIng"
             confirmButtonText='Si, eliminar'
             confirmButtonType='danger'
             cancelButtonText='No, cancelar'
             cancelButtonType='primary'
             icon="el-icon-info"
             iconColor="red"
-            @onConfirm = updateIngreso()
+            @onConfirm = finalizarIngreso()
             title="Estas seguro que quieres dar de baja?"
           >
-            <el-button type="danger" v-if="!addIng" slot="reference" round>Dar ingreso de baja</el-button>
+            <el-button type="danger" slot="reference" round>Dar ingreso de baja</el-button>
           </el-popconfirm>
   </div>
   </el-card>
@@ -52,7 +52,7 @@
           <el-form-item label="Salas" prop="salas">
             <el-select v-model="ingreso.sala" placeholder="Seleccionar" @change="handleChangeVemecs()">
               <el-option
-                v-for="item in salas"
+                v-for="item in salasIng"
                 :key="item.id"
                 :label="item.nombre"
                 :value="item.id"
@@ -123,7 +123,8 @@ import vemecServices from '@/api/vemecServices'
 
 export default {
   props: [
-    'paciente'
+    'paciente',
+    'salas'
   ],
   filters: {
     statusFilter(status) {
@@ -145,7 +146,7 @@ export default {
       disableC: true,
       centro: '',
       centros: [],
-      salas: [],
+      salasIng: [],
       vemecs: [],
       listLoading: false,
       ingresos: [],
@@ -176,7 +177,7 @@ export default {
         },{
           id: "SANO",
           nombre: 'Sano'
-      }]
+        }]
     }
   },
   created(){
@@ -234,6 +235,12 @@ export default {
                 vemec: this.ingreso.vemec
               }
               vemecServices.services.createIngreso(ingreso).then(res => {
+                this.paciente.ingresos.push(res.data)
+                 vemecServices.services.salaIngreso(res.data.id)
+                  .then(response => {
+                    this.salas.push(response.data);
+                  })
+                  .catch(err => console.log(err))
                 this.dialogIngreso = false
                 this.$notify({
                   title: 'Éxito',
@@ -241,6 +248,7 @@ export default {
                   type: 'success',
                   duration: 3000
                 })
+                this.verificarIngreso();
                 this.addIng = false;
               }).catch(err => {
                 this.$notify({
@@ -253,46 +261,32 @@ export default {
             }
         })
       },
-      async updateIngreso(){
+      async finalizarIngreso(){
           let hoy = new Date();
           let fecha = (hoy.getFullYear() + '-' + (hoy.getMonth() +1) + '-' + hoy.getDate());
           let hora = hoy.getHours() + ':' + hoy.getMinutes() + ':' + hoy.getSeconds();
-          
-          let fechaIng = new Date(this.ingresoUpdate.fechaIngreso).toISOString().slice(0, 19).replace('T', ' ');
-        
-          await vemecServices.services.PSVIngreso(this.ingresoUpdate.id)
-            .then(response => {
-              let PSV = response.data;
-              const ingreso = {
-                  causa: this.ingresoUpdate.causa,
-                  estado: this.ingresoUpdate.estado,
-                  fechaEgreso: fecha +" "+ hora,
-                  fechaIngreso: fechaIng,
-                  paciente: PSV[0].id,
-                  sala: PSV[1].id,
-                  vemec: PSV[2].id
-                }
-              console.log(ingreso)
-              vemecServices.services.updateIngreso(ingreso, this.ingresoUpdate.id)
-                .then(res => {
-                  this.$notify({
-                    title: 'Éxito',
-                    message: 'Se actualizó el centro correctamente',
-                    type: 'success',
-                    duration: 3000
-                  })
-                  this.addIng = true;
-                }).catch(err => {
-                  this.$notify({
-                    title: 'Error',
-                    message: 'Ocurrió un error al actualizar',
-                    type: 'error',
-                    duration: 3000
-                  })
-                })
-            }).catch(err => console.log(err))
 
-
+          const ingreso = {
+              fechaEgreso: fecha +" "+ hora,             
+          }
+          vemecServices.services.finalizarIngreso(ingreso, this.ingresoUpdate.id)
+            .then(res => {
+              this.addIng = true;      
+              this.paciente.ingresos[this.paciente.ingresos.length-1].fechaEgreso = res.data.fechaEgreso;
+              this.$notify({
+                title: 'Éxito',
+                message: 'Se actualizó el centro correctamente',
+                type: 'success',
+                duration: 3000
+              })
+            }).catch(err => {
+              this.$notify({
+                title: 'Error',
+                message: 'Ocurrió un error al actualizar',
+                type: 'error',
+                duration: 3000
+              })
+            })
       },
       async handleInfo(){
         this.listLoading = true;
@@ -319,20 +313,29 @@ export default {
           nombre: null,
           centro: parseInt(this.centro)
         }).then(response => {
-          this.salas = [];
+          this.salasIng = [];
           let temp = response.data[2];
+
           temp.forEach((item, index) =>{
             if(Object.keys(item.vemecs).length){
-              this.salas.push(item);
-            }
+              let vemecsD = 0;
+              item.vemecs.forEach(vem =>{
+                if(!vem.estado){
+                  vemecsD++;
+                }
+              })
+              if(vemecsD != 0){
+                this.salasIng.push(item);
+              }
+            }         
           })
-          if(this.salas.length){
+          if(this.salasIng.length){
             this.disable = false;
           }else{
             this.disable = true;
             this.$notify({
               title: 'Error',
-              message: 'Este centro no contiene VeMecs disponibles',
+              message: 'Este centro no contiene VeMecs',
               type: 'error',
               duration: 3000
             })
@@ -345,19 +348,25 @@ export default {
         this.listLoading = true;
         await vemecServices.services.getSalaByID(parseInt(this.ingreso.sala))
         .then(response => {
-          this.vemecs = response.data.vemecs;
+          let temp = response.data.vemecs;
+          this.vemecs = [];
+          temp.forEach(item =>{
+              if(!item.estado){
+                this.vemecs.push(item);
+              }
+          })
         }).catch(err => console.log(err))
         this.listLoading = false;
         this.disableV = false;
-    },
-    verificarIngreso(){
-      this.ingresos.forEach((item)=>{
-        if(!item.fechaEgreso){
-            this.ingresoUpdate = item;
-            this.addIng = false;
-        }
-      })
-    }
+      },
+      verificarIngreso(){
+        this.ingresos.forEach((item)=>{
+          if(!item.fechaEgreso){
+              this.ingresoUpdate = item;
+              this.addIng = false;
+          }
+        })
+      }
   }
 }
 </script>

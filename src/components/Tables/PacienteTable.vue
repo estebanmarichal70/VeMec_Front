@@ -321,7 +321,6 @@ export default {
                 edad: parseInt(this.paciente.edad),
                 patologias: this.paciente.patologias,
             }
-          console.log(this.paciente.sexo + " SESO");
             if(this.paciente.sexo == "option1"){
               pacienteNuevo.sexo = "MASCULINO";
             }

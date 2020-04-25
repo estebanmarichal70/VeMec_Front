@@ -1,8 +1,8 @@
 <template>
   <div class="block">
       <div class="block">
-    <el-timeline>
-      <el-timeline-item  v-for="(item,index) of ingresos " :timestamp="parseFecha(item.fechaIngreso,'LLLL')" :key="index" placement="top">
+    <el-timeline v-if="paciente.ingresos">
+      <el-timeline-item  v-for="(item,index) of paciente.ingresos" :timestamp="parseFecha(item.fechaIngreso,'LLLL')" :key="index" placement="top">
         <el-card>
           <p><strong> Causa: </strong>{{ item.causa }}</p>
           <strong>Estado: </strong><el-badge v-if="item.estado == 'ESTABLE' " :value="item.estado" class="item" type="primary">
@@ -37,33 +37,19 @@ import {convertirFecha} from '@/utils/index'
 
 export default {
   props: [
-    'paciente'
+    'paciente',
+    'salas'
   ],
   data(){
     return{
-      ingresos: null,
-      salas: []
     }
   },
-  mounted(){
-    this.ingresos = this.paciente.ingresos;
-    this.getSala();
+  created(){
+    
   },
   methods: {
     parseFecha(unix_timestamp, formato){
       return convertirFecha(unix_timestamp, formato);
-    },
-    async getSala(){
-      this.listLoading = true
-
-      for(let index in this.ingresos){
-        await vemecServices.services.salaIngreso(this.ingresos[index].id)
-        .then(response => {
-          this.salas.push(response.data);
-        })
-        .catch(err => console.log(err))
-          this.listLoading = false
-      }
     }
   }
 }

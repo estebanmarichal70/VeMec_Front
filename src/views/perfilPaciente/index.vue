@@ -10,16 +10,15 @@
         <el-col :span="18" :xs="24">
           <el-card>
             <el-tabs v-model="activeTab">
-              <el-tab-pane label="Actividad" name="activity">
-                <activity v-if="paciente" :paciente="paciente" />
+              <el-tab-pane label="Actividad" name="actividad">
+                <activity v-if="paciente" :paciente="paciente" :salas="salas"/>
               </el-tab-pane>
               <el-tab-pane label="Ingresos" name="ingresos">
-                <Ingresos v-if="paciente" :paciente="paciente" />
+                <Ingresos v-if="paciente" :paciente="paciente" :salas="salas" />
               </el-tab-pane>
             </el-tabs>
           </el-card>
         </el-col>
-
       </el-row>
     </div>
   </div>
@@ -38,10 +37,10 @@ export default {
   data() {
     return {
       user: {},
-      activeTab: 'activity',
+      activeTab: 'actividad',
       paciente: null,
-      sizeIngreso:'',
-      estado:'',
+      ingresos: [],
+      salas: [],
       listQuery: {
           page: 1,
           limit: 10,
@@ -60,7 +59,7 @@ export default {
   },
   created() {
     this.listQuery.paciente = this.$route.params.id
-    this.getPaciente()
+    this.getPaciente();
   },
   methods: {
     async getPaciente() {
@@ -68,13 +67,24 @@ export default {
       await vemecServices.services.getPacienteByID(this.listQuery.paciente)
       .then(response => {
         this.paciente = response.data;
-        this.sizeIngreso = parseInt(this.paciente.ingresos.length)-1;
-
-        if(this.sizeIngreso >= 0){
-          this.estado = this.paciente.ingresos[(this.sizeIngreso)].estado;
-        }
+        this.ingresos = this.paciente.ingresos;
+        this.getSalas();
       }).catch(err => console.log(err))
       this.listLoading = false
+    },
+    parseFecha(unix_timestamp, formato){
+      return convertirFecha(unix_timestamp, formato);
+    },
+    getSalas(){
+      this.listLoading = true;
+      for(let index in this.ingresos){
+        vemecServices.services.salaIngreso(this.ingresos[index].id)
+        .then(response => {
+          this.salas.push(response.data);
+        })
+        .catch(err => console.log(err))
+          this.listLoading = false
+      }
     }
   }
 }

@@ -11,25 +11,33 @@
           {{ paciente.nombre }}
         </pan-thumb>
       </div>
-      <div class="box-center">
-        <div class="user-name text-center">{{ user.name }}</div>
-        <div class="user-role text-center text-muted">{{ user.role | uppercaseFirst }}</div>
-      </div>
     </div>
 
     <div class="user-bio">
-      <div class="user-education user-bio-section">
+      <div class="user-education user-bio-section" v-if="paciente.ingresos.length">
         <div class="user-bio-section-header"><svg-icon icon-class="education" /><span>Actualmente</span></div>
         <div class="user-bio-section-body">
-          <div class="text-muted" v-if="paciente.ingresos[paciente.ingresos.length-1]">
-            {{paciente.ingresos[(paciente.ingresos.length)-1].estado}}
+          <div class="text-muted" v-if="!paciente.ingresos[paciente.ingresos.length-1].fechaEgreso">
+            <el-badge v-if="paciente.ingresos[paciente.ingresos.length-1].estado == 'ESTABLE' " :value="paciente.ingresos[paciente.ingresos.length-1].estado" class="item" type="primary">
+            </el-badge>
+            <el-badge v-if="paciente.ingresos[paciente.ingresos.length-1].estado == 'CRITICO' " :value="paciente.ingresos[paciente.ingresos.length-1].estado" class="item" type="danger">
+            </el-badge>
+            <el-badge v-if="paciente.ingresos[paciente.ingresos.length-1].estado == 'SANO' " :value="paciente.ingresos[paciente.ingresos.length-1].estado" class="item" type="success">
+            </el-badge>
+            <el-badge v-if="paciente.ingresos[paciente.ingresos.length-1].estado == 'INTERMEDIO' " :value="paciente.ingresos[paciente.ingresos.length-1].estado" class="item" type="warning">
+            </el-badge>
+            <el-badge v-if="paciente.ingresos[paciente.ingresos.length-1].estado == 'DIFUNTO' " :value="paciente.ingresos[paciente.ingresos.length-1].estado" class="item" type="info">
+            </el-badge>
+          </div>
+          <div class="text-muted" v-else>
+              <el-badge value="Sin ingresar" class="item" type="primary"></el-badge>
           </div>
         </div>
       </div>
 
-      <div class="user-skills user-bio-section">
+      <div class="user-skills user-bio-section" >
         <div class="user-bio-section-header"><svg-icon icon-class="skill" /><span>Patologias</span></div>
-        <div class="user-bio-section-body">
+        <div class="user-bio-section-body" v-if="paciente.patologias">
           <div class="progress-item" >
             <ul>
               <li v-for="item in paciente.patologias.patologias" :key="item.key">
@@ -37,6 +45,9 @@
               </li>
             </ul>
           </div>
+        </div>
+        <div v-else>
+          <p>Sin patologias</p>
         </div>
       </div>
     </div>
@@ -47,20 +58,9 @@
 import PanThumb from '@/components/PanThumb'
 export default {
   components: { PanThumb },
-  props: {
-    user: {
-      type: Object,
-      default: () => {
-        return {
-          name: '',
-          email: '',
-          avatar: '',
-          role: ''
-        }
-      }
-    },
-    paciente:''
-  }
+ props: [
+    'paciente'
+  ]
 }
 
 </script>

@@ -64,11 +64,9 @@ export default {
     setOptions({ presionSalida, presionEntrada, fechas } = {}) {
       this.chart.setOption({
         xAxis: {
-          data: fechas,
-          boundaryGap: false,
-          axisTick: {
-            show: false
-          }
+          data: fechas.map(function (str) {
+                return str.replace('.', '\n');
+            }),
         },
         grid: {
           left: 10,

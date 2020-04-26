@@ -126,7 +126,6 @@ import vemecServices from '@/api/vemecServices'
 export default {
   props: [
     'paciente',
-    'ingresos'
     'salas'
   ],
   filters: {
@@ -236,7 +235,7 @@ export default {
                 vemec: this.ingreso.vemec
               }
               vemecServices.services.createIngreso(ingreso).then(res => {
-                  this.ingresos.unshift(res.data)
+                this.paciente.ingresos.unshift(res.data)
                  vemecServices.services.salaIngreso(res.data.id)
                   .then(response => {
                     this.salaInf = response.data.nombre
@@ -274,7 +273,6 @@ export default {
           vemecServices.services.finalizarIngreso(ingreso, this.paciente.ingresos[0].id)
             .then(res => {
               this.addIng = true;      
-              this.ingresos[0].fechaEgreso = res.data.fechaEgreso;
               this.paciente.ingresos[0].fechaEgreso = res.data.fechaEgreso;
               this.$notify({
                 title: 'Éxito',

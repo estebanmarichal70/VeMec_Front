@@ -6,7 +6,7 @@
   </div>
   <div>
       <p v-if="addIng"><strong>{{paciente.nombre}}</strong> se encuentra actualmente sin ingresar en ningún centro</p>
-      <p v-else><strong>{{paciente.nombre}}</strong> se encuentra ingresado en el centro {{}}</p>
+      <p v-else><strong>{{paciente.nombre}}</strong> se encuentra ingresado en el centro ''  en la sala <strong>{{salaInf}}</strong> y esta usando el VeMec Nro.<strong>{{vemecInf}}</strong></p>
       
       <el-button type="primary" v-if="addIng" @click="dialogIngreso = true, active = 0, clear(), centro = ''" round>Añadir Ingreso</el-button>
        <el-popconfirm v-if="!addIng"
@@ -126,7 +126,8 @@ import vemecServices from '@/api/vemecServices'
 export default {
   props: [
     'paciente',
-    'salas'
+    'salas',
+    'ingresos'
   ],
   filters: {
     statusFilter(status) {
@@ -140,7 +141,8 @@ export default {
   },
   data(){
     return{
-      ingresoUpdate: null,
+      salaInf: '',
+      vemecInf: '',
       addIng: true,
       active: 0,
       disable: true,
@@ -151,7 +153,6 @@ export default {
       salasIng: [],
       vemecs: [],
       listLoading: false,
-      ingresos: [],
       ingreso: {
         causa: '',
         estado: '',
@@ -182,9 +183,8 @@ export default {
         }]
     }
   },
-  created(){
-    this.ingresos = this.paciente.ingresos;
-    this.ingreso.paciente = this.paciente.id;
+  mounted(){
+    console.log("activity")
     this.handleInfo();
     this.verificarIngreso();
   },
@@ -232,14 +232,17 @@ export default {
                 estado: this.ingreso.estado,
                 fechaEgreso: null,
                 fechaIngreso: fecha,
-                paciente: this.ingreso.paciente,
+                paciente: this.paciente.id,
                 sala: this.ingreso.sala,
                 vemec: this.ingreso.vemec
               }
+              console.log(ingreso)
               vemecServices.services.createIngreso(ingreso).then(res => {
-                this.paciente.ingresos.unshift(res.data)
+                  this.ingresos.unshift(res.data)
                  vemecServices.services.salaIngreso(res.data.id)
                   .then(response => {
+                    this.salaInf = response.data.nombre
+                    this.vemecInf = response.data.vemec.id
                     this.salas.unshift(response.data);
                   })
                   .catch(err => console.log(err))
@@ -250,8 +253,7 @@ export default {
                   type: 'success',
                   duration: 3000
                 })
-                this.verificarIngreso();
-                this.addIng = false;
+                this.addIng = true;
               }).catch(err => {
                 this.$notify({
                   title: 'Error',
@@ -271,20 +273,20 @@ export default {
           const ingreso = {
               fechaEgreso: fecha +" "+ hora,             
           }
-          vemecServices.services.finalizarIngreso(ingreso, this.ingresoUpdate.id)
+          vemecServices.services.finalizarIngreso(ingreso, this.ingresos[0].id)
             .then(res => {
               this.addIng = true;      
-              this.paciente.ingresos[0].fechaEgreso = res.data.fechaEgreso;
+              this.ingresos[0].fechaEgreso = res.data.fechaEgreso;
               this.$notify({
                 title: 'Éxito',
-                message: 'Se actualizó el centro correctamente',
+                message: 'Se dio de baja correctamente',
                 type: 'success',
                 duration: 3000
               })
             }).catch(err => {
               this.$notify({
                 title: 'Error',
-                message: 'Ocurrió un error al actualizar',
+                message: 'Ocurrió un error al dar de baja',
                 type: 'error',
                 duration: 3000
               })
@@ -364,7 +366,6 @@ export default {
       verificarIngreso(){
         this.ingresos.forEach((item)=>{
           if(!item.fechaEgreso){
-              this.ingresoUpdate = item;
               this.addIng = false;
           }
         })

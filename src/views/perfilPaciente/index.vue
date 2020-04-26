@@ -11,7 +11,7 @@
           <el-card>
             <el-tabs v-model="activeTab">
               <el-tab-pane label="Actividad" name="actividad">
-                <activity v-if="paciente" :paciente="paciente" :salas="salas"/>
+                <activity v-if="paciente" :ingresos="ingresos" :salas="salas" :paciente="paciente"/>
               </el-tab-pane>
               <el-tab-pane label="Ingresos" name="ingresos">
                 <Ingresos v-if="paciente" :paciente="paciente" :salas="salas" />
@@ -39,6 +39,7 @@ export default {
       user: {},
       activeTab: 'actividad',
       paciente: null,
+      ingresos: null,
       salas: [],
       listQuery: {
           page: 1,
@@ -56,14 +57,15 @@ export default {
       'roles'
     ])
   },
-  created() {
+  mounted() {
+    console.log("index")
     this.listQuery.paciente = this.$route.params.id
     this.getPaciente();
   },
   methods: {
     async getPaciente() {
       this.listLoading = true
-      await vemecServices.services.getPacienteByID(this.listQuery.paciente)
+      vemecServices.services.getPacienteByID(this.listQuery.paciente)
       .then(response => {
         this.paciente = response.data;
           vemecServices.services.getIngresos({
@@ -72,7 +74,7 @@ export default {
             id: '',
             idP: parseInt(this.paciente.id)
           }).then(res => {
-            this.paciente.ingresos = res.data[2]
+            this.ingresos = res.data[2];
             this.getSalas();
           }).catch(err => console.log(err))
       }).catch(err => console.log(err))
@@ -81,16 +83,16 @@ export default {
     parseFecha(unix_timestamp, formato){
       return convertirFecha(unix_timestamp, formato);
     },
-    getSalas(){
+    async getSalas(){
       this.listLoading = true;
       for(let index in this.paciente.ingresos){
-        vemecServices.services.salaIngreso(this.paciente.ingresos[index].id)
+        await vemecServices.services.salaIngreso(this.paciente.ingresos[index].id)
         .then(response => {
           this.salas.push(response.data);
         })
         .catch(err => console.log(err))
-          this.listLoading = false
       }
+      this.listLoading = false
     }
   }
 }

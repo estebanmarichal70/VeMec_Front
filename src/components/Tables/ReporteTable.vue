@@ -527,13 +527,13 @@ export default {
     handleDownload() {
       this.downloadLoading = true
         import('@/vendor/Export2Excel').then(excel => {
-          const tHeader = ['Id', 'Presion Maxima', 'Presion Minima', 'Presion Entrada', 'Presion Salida', 'Frecuencia Gas','Volumen Gas', 'Temperatura Entrada', 'Temperatura Salida', 'Mezcla', 'Humedad Aire']
-          const filterVal = ['id', 'Presion Maxima', 'Presion Minima', 'Presion Entrada', 'Presion Salida', 'Frecuencia Gas','Volumen Gas', 'Temperatura Entrada', 'Temperatura Salida', 'Mezcla', 'Humedad Aire']
+          const tHeader = ['Id', 'Presion Maxima', 'Presion Minima', 'Presion Entrada', 'Presion Salida', 'Temperatura Entrada', 'Temperatura Salida','Volumen Gas', 'Frecuencia Gas', 'Mezcla', 'Humedad Aire', 'Fecha']
+          const filterVal = ['id', 'presionMaxima', 'presionMinima', 'presionEntrada', 'presionSalida', 'tempEntrada', 'tempSalida', 'volGas', 'frecGas', 'mezcla', 'humedadAire', 'time']
           const data = this.formatJson(filterVal)
           excel.export_json_to_excel({
             header: tHeader,
             data,
-            filename: 'Centros'
+            filename: 'Reportes'
           })
           this.downloadLoading = false
         })

@@ -290,12 +290,14 @@ export default {
             })
       },
       async handleInfo(){
-        vemecServices.services.salaIngreso(this.paciente.ingresos[0].id)
-        .then(response => {
-          this.salaInf = response.data.nombre;
-          this.vemecInf = this.paciente.ingresos[0].vemec.id;
-        })
-        .catch(err => console.log(err))
+        if(this.paciente.ingresos.length){
+          vemecServices.services.salaIngreso(this.paciente.ingresos[0].id)
+          .then(response => {
+            this.salaInf = response.data.nombre;
+            this.vemecInf = this.paciente.ingresos[0].vemec.id;
+          })
+          .catch(err => console.log(err))
+        }
 
         await vemecServices.services.getCentros({
           page: 1,

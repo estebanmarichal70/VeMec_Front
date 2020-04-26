@@ -11,10 +11,10 @@
           <el-card>
             <el-tabs v-model="activeTab">
               <el-tab-pane label="Actividad" name="actividad">
-                <activity v-if="paciente" :ingresos="ingresos" :salas="salas" :paciente="paciente"/>
+                <activity v-if="pase" :salas="salas" :paciente="paciente"/>
               </el-tab-pane>
               <el-tab-pane label="Ingresos" name="ingresos">
-                <Ingresos v-if="paciente" :paciente="paciente" :salas="salas" />
+                <Ingresos v-if="pase" :paciente="paciente" :salas="salas" />
               </el-tab-pane>
             </el-tabs>
           </el-card>
@@ -37,17 +37,14 @@ export default {
   data() {
     return {
       user: {},
+      pase: false,
       activeTab: 'actividad',
       paciente: null,
-      ingresos: null,
       salas: [],
       listQuery: {
           page: 1,
           limit: 10,
-          paciente: null,
-          nombre: '',
-          apellido: '',
-          edad: null
+          paciente: null
         }
     }
   },
@@ -58,7 +55,6 @@ export default {
     ])
   },
   mounted() {
-    console.log("index")
     this.listQuery.paciente = this.$route.params.id
     this.getPaciente();
   },
@@ -74,7 +70,7 @@ export default {
             id: '',
             idP: parseInt(this.paciente.id)
           }).then(res => {
-            this.ingresos = res.data[2];
+            this.paciente.ingresos = res.data[2];
             this.getSalas();
           }).catch(err => console.log(err))
       }).catch(err => console.log(err))
@@ -84,6 +80,7 @@ export default {
       return convertirFecha(unix_timestamp, formato);
     },
     async getSalas(){
+      this.pase = true;
       this.listLoading = true;
       for(let index in this.paciente.ingresos){
         await vemecServices.services.salaIngreso(this.paciente.ingresos[index].id)

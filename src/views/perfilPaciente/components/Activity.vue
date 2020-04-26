@@ -6,7 +6,7 @@
   </div>
   <div>
       <p v-if="addIng"><strong>{{paciente.nombre}}</strong> se encuentra actualmente sin ingresar en ningún centro</p>
-      <p v-else><strong>{{paciente.nombre}}</strong> se encuentra ingresado en el centro ''  en la sala <strong>{{salaInf}}</strong> y esta usando el VeMec Nro.<strong>{{vemecInf}}</strong></p>
+      <p v-else><strong>{{paciente.nombre}}</strong> se encuentra ingresado en la sala <strong>{{salaInf}}</strong> y esta utilizando el VeMec Nro.<strong>{{vemecInf}}</strong></p>
       
       <el-button type="primary" v-if="addIng" @click="dialogIngreso = true, active = 0, clear(), centro = ''" round>Añadir Ingreso</el-button>
        <el-popconfirm v-if="!addIng"
@@ -126,8 +126,8 @@ import vemecServices from '@/api/vemecServices'
 export default {
   props: [
     'paciente',
-    'salas',
     'ingresos'
+    'salas'
   ],
   filters: {
     statusFilter(status) {
@@ -184,7 +184,6 @@ export default {
     }
   },
   mounted(){
-    console.log("activity")
     this.handleInfo();
     this.verificarIngreso();
   },
@@ -236,7 +235,6 @@ export default {
                 sala: this.ingreso.sala,
                 vemec: this.ingreso.vemec
               }
-              console.log(ingreso)
               vemecServices.services.createIngreso(ingreso).then(res => {
                   this.ingresos.unshift(res.data)
                  vemecServices.services.salaIngreso(res.data.id)
@@ -273,10 +271,11 @@ export default {
           const ingreso = {
               fechaEgreso: fecha +" "+ hora,             
           }
-          vemecServices.services.finalizarIngreso(ingreso, this.ingresos[0].id)
+          vemecServices.services.finalizarIngreso(ingreso, this.paciente.ingresos[0].id)
             .then(res => {
               this.addIng = true;      
               this.ingresos[0].fechaEgreso = res.data.fechaEgreso;
+              this.paciente.ingresos[0].fechaEgreso = res.data.fechaEgreso;
               this.$notify({
                 title: 'Éxito',
                 message: 'Se dio de baja correctamente',
@@ -294,6 +293,14 @@ export default {
       },
       async handleInfo(){
         this.listLoading = true;
+
+        vemecServices.services.salaIngreso(this.paciente.ingresos[0].id)
+        .then(response => {
+          this.salaInf = response.data.nombre;
+          this.vemecInf = this.paciente.ingresos[0].vemec.id;
+        })
+        .catch(err => console.log(err))
+
         await vemecServices.services.getCentros({
           page: 1,
           limit: 99999999,
@@ -364,7 +371,7 @@ export default {
         this.disableV = false;
       },
       verificarIngreso(){
-        this.ingresos.forEach((item)=>{
+        this.paciente.ingresos.forEach((item)=>{
           if(!item.fechaEgreso){
               this.addIng = false;
           }

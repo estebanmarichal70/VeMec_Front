@@ -151,7 +151,6 @@ export default {
       centros: [],
       salasIng: [],
       vemecs: [],
-      listLoading: false,
       ingreso: {
         causa: '',
         estado: '',
@@ -182,9 +181,10 @@ export default {
         }]
     }
   },
-  mounted(){
+  created(){
     this.handleInfo();
     this.verificarIngreso();
+    this.ingreso.paciente = this.paciente.id
   },
   methods: {
       next() {
@@ -230,7 +230,7 @@ export default {
                 estado: this.ingreso.estado,
                 fechaEgreso: null,
                 fechaIngreso: fecha,
-                paciente: this.paciente.id,
+                paciente: this.ingreso.paciente,
                 sala: this.ingreso.sala,
                 vemec: this.ingreso.vemec
               }
@@ -239,18 +239,18 @@ export default {
                  vemecServices.services.salaIngreso(res.data.id)
                   .then(response => {
                     this.salaInf = response.data.nombre
-                    this.vemecInf = response.data.vemec.id
+                    this.vemecInf = this.paciente.ingresos[0].vemec.id;
                     this.salas.unshift(response.data);
                   })
                   .catch(err => console.log(err))
-                this.dialogIngreso = false
-                this.$notify({
+                  this.dialogIngreso = false
+                  this.$notify({
                   title: 'Éxito',
                   message: 'Se creó el ingreso correctamente',
                   type: 'success',
                   duration: 3000
                 })
-                this.addIng = true;
+                this.addIng = false;
               }).catch(err => {
                 this.$notify({
                   title: 'Error',
@@ -290,8 +290,6 @@ export default {
             })
       },
       async handleInfo(){
-        this.listLoading = true;
-
         vemecServices.services.salaIngreso(this.paciente.ingresos[0].id)
         .then(response => {
           this.salaInf = response.data.nombre;
@@ -312,10 +310,8 @@ export default {
             }
           })
         }).catch(err => console.log(err))
-        this.listLoading = false;
       },
       async handleChangeSala() {
-        this.listLoading = true
         await vemecServices.services.getSalas({
           page: 1,
           limit: 99999999,
@@ -350,11 +346,9 @@ export default {
             })
           }
         }).catch(err => console.log(err))
-        this.listLoading = false
       },
       async handleChangeVemecs() {
         this.disableV = false;
-        this.listLoading = true;
         await vemecServices.services.getSalaByID(parseInt(this.ingreso.sala))
         .then(response => {
           let temp = response.data.vemecs;
@@ -365,7 +359,6 @@ export default {
               }
           })
         }).catch(err => console.log(err))
-        this.listLoading = false;
         this.disableV = false;
       },
       verificarIngreso(){

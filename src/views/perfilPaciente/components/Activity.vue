@@ -1,11 +1,13 @@
 <template>
 <div>
-
   <el-card class="box-card" shadow="hover">
   <div slot="header" class="clearfix">
     <span>Estado del paciente</span>
   </div>
   <div>
+      <p v-if="addIng"><strong>{{paciente.nombre}}</strong> se encuentra actualmente sin ingresar en ningún centro</p>
+      <p v-else><strong>{{paciente.nombre}}</strong> se encuentra ingresado en el centro {{}}</p>
+      
       <el-button type="primary" v-if="addIng" @click="dialogIngreso = true, active = 0, clear(), centro = ''" round>Añadir Ingreso</el-button>
        <el-popconfirm v-if="!addIng"
             confirmButtonText='Si, eliminar'
@@ -18,7 +20,7 @@
             title="Estas seguro que quieres dar de baja?"
           >
             <el-button type="danger" slot="reference" round>Dar ingreso de baja</el-button>
-          </el-popconfirm>
+        </el-popconfirm>
   </div>
   </el-card>
 
@@ -235,10 +237,10 @@ export default {
                 vemec: this.ingreso.vemec
               }
               vemecServices.services.createIngreso(ingreso).then(res => {
-                this.paciente.ingresos.push(res.data)
+                this.paciente.ingresos.unshift(res.data)
                  vemecServices.services.salaIngreso(res.data.id)
                   .then(response => {
-                    this.salas.push(response.data);
+                    this.salas.unshift(response.data);
                   })
                   .catch(err => console.log(err))
                 this.dialogIngreso = false
@@ -272,7 +274,7 @@ export default {
           vemecServices.services.finalizarIngreso(ingreso, this.ingresoUpdate.id)
             .then(res => {
               this.addIng = true;      
-              this.paciente.ingresos[this.paciente.ingresos.length-1].fechaEgreso = res.data.fechaEgreso;
+              this.paciente.ingresos[0].fechaEgreso = res.data.fechaEgreso;
               this.$notify({
                 title: 'Éxito',
                 message: 'Se actualizó el centro correctamente',

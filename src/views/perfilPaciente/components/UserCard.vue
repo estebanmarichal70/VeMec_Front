@@ -1,14 +1,14 @@
 <template>
   <el-card style="margin-bottom:20px;">
     <div slot="header" class="clearfix">
-      <span>{{paciente.nombre}}</span>
+      <span>Información</span>
     </div>
 
     <div class="user-profile">
       <div class="box-center">
         <pan-thumb :height="'100px'" :width="'100px'" :hoverable="false">
           <div>Hola</div>
-          {{ paciente.nombre }}
+          <strong>{{ paciente.nombre }}</strong>
         </pan-thumb>
       </div>
     </div>
@@ -17,16 +17,16 @@
       <div class="user-education user-bio-section">
         <div class="user-bio-section-header"><svg-icon icon-class="education" /><span>Actualmente</span></div>
         <div class="user-bio-section-body" v-if="paciente.ingresos.length">
-          <div class="text-muted" v-if="!paciente.ingresos[paciente.ingresos.length-1].fechaEgreso">
-            <el-badge v-if="paciente.ingresos[paciente.ingresos.length-1].estado == 'ESTABLE' " :value="paciente.ingresos[paciente.ingresos.length-1].estado" class="item" type="primary">
+          <div class="text-muted" v-if="!paciente.ingresos[0].fechaEgreso">
+            <el-badge v-if="paciente.ingresos[0].estado == 'ESTABLE' " :value="paciente.ingresos[0].estado" class="item" type="primary">
             </el-badge>
-            <el-badge v-if="paciente.ingresos[paciente.ingresos.length-1].estado == 'CRITICO' " :value="paciente.ingresos[paciente.ingresos.length-1].estado" class="item" type="danger">
+            <el-badge v-if="paciente.ingresos[0].estado == 'CRITICO' " :value="paciente.ingresos[0].estado" class="item" type="danger">
             </el-badge>
-            <el-badge v-if="paciente.ingresos[paciente.ingresos.length-1].estado == 'SANO' " :value="paciente.ingresos[paciente.ingresos.length-1].estado" class="item" type="success">
+            <el-badge v-if="paciente.ingresos[0].estado == 'SANO' " :value="paciente.ingresos[0].estado" class="item" type="success">
             </el-badge>
-            <el-badge v-if="paciente.ingresos[paciente.ingresos.length-1].estado == 'INTERMEDIO' " :value="paciente.ingresos[paciente.ingresos.length-1].estado" class="item" type="warning">
+            <el-badge v-if="paciente.ingresos[0].estado == 'INTERMEDIO' " :value="paciente.ingresos[0].estado" class="item" type="warning">
             </el-badge>
-            <el-badge v-if="paciente.ingresos[paciente.ingresos.length-1].estado == 'DIFUNTO' " :value="paciente.ingresos[paciente.ingresos.length-1].estado" class="item" type="info">
+            <el-badge v-if="paciente.ingresos[0].estado == 'DIFUNTO' " :value="paciente.ingresos[0].estado" class="item" type="info">
             </el-badge>
           </div>
           <div class="text-muted" v-else>

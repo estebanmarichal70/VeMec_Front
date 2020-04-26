@@ -136,18 +136,18 @@
             <el-button type="primary" size="mini" @click="handleUpdateVemec(row)">
               Actualizar
             </el-button>
-            <el-popconfirm
-              confirmButtonText='Si, eliminar'
-              confirmButtonType='danger'
-              cancelButtonText='No, cancelar'
-              cancelButtonType='success'
-              icon="el-icon-info"
-              iconColor="red"
-              @onConfirm = deleteDataVemec(row,$index)
-              title="Estas seguro que quieres eliminar?"
-            >
-              <el-button size="mini" type="danger" slot="reference">Eliminar</el-button>
-            </el-popconfirm>
+              <el-popconfirm
+                confirmButtonText='Si, eliminar'
+                confirmButtonType='danger'
+                cancelButtonText='No, cancelar'
+                cancelButtonType='success'
+                icon="el-icon-info"
+                iconColor="red"
+                @onConfirm = deleteDataVemec(row,$index)
+                title="Estas seguro que quieres eliminar?"
+              >
+                  <el-button size="mini" :disabled="row.estado" type="danger" slot="reference">Eliminar</el-button>
+              </el-popconfirm>
           </template>
       </el-table-column>
     </el-table>

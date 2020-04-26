@@ -445,7 +445,7 @@ export default {
       this.downloadLoading = true
         import('@/vendor/Export2Excel').then(excel => {
           const tHeader = ['Cedula', 'Nombre', 'Apellido', 'Edad', 'Sexo']
-          const filterVal = ['cedula', 'nombre', 'apellido', 'edad', 'sexo']
+          const filterVal = ['id', 'nombre', 'apellido', 'edad', 'sexo']
           const data = this.formatJson(filterVal)
           excel.export_json_to_excel({
             header: tHeader,
@@ -495,21 +495,3 @@ export default {
   }
 }
 </script>
-
-<style>
-  .el-tag + .el-tag {
-    margin-left: 10px;
-  }
-  .button-new-tag {
-    margin-left: 10px;
-    height: 32px;
-    line-height: 30px;
-    padding-top: 0;
-    padding-bottom: 0;
-  }
-  .input-new-tag {
-    width: 90px;
-    margin-left: 10px;
-    vertical-align: bottom;
-  }
-</style>

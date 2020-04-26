@@ -39,7 +39,6 @@ export default {
       user: {},
       activeTab: 'actividad',
       paciente: null,
-      ingresos: [],
       salas: [],
       listQuery: {
           page: 1,
@@ -67,8 +66,15 @@ export default {
       await vemecServices.services.getPacienteByID(this.listQuery.paciente)
       .then(response => {
         this.paciente = response.data;
-        this.ingresos = this.paciente.ingresos;
-        this.getSalas();
+          vemecServices.services.getIngresos({
+            page: 1,
+            limit: 99999999,
+            id: '',
+            idP: parseInt(this.paciente.id)
+          }).then(res => {
+            this.paciente.ingresos = res.data[2]
+            this.getSalas();
+          }).catch(err => console.log(err))
       }).catch(err => console.log(err))
       this.listLoading = false
     },
@@ -77,8 +83,8 @@ export default {
     },
     getSalas(){
       this.listLoading = true;
-      for(let index in this.ingresos){
-        vemecServices.services.salaIngreso(this.ingresos[index].id)
+      for(let index in this.paciente.ingresos){
+        vemecServices.services.salaIngreso(this.paciente.ingresos[index].id)
         .then(response => {
           this.salas.push(response.data);
         })

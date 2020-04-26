@@ -57,6 +57,30 @@
         </template>
       </el-table-column>
 
+      <el-table-column label="Presión Entrada" align="center" min-width="85px">
+        <template slot-scope="{row}">
+          <span>{{ row.presionEntrada + row.unidadPresion}}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="Presión Salida" align="center" min-width="80px">
+        <template slot-scope="{row}">
+          <span>{{ row.presionSalida + row.unidadPresion}}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="Temperatura Entrada" align="center" min-width="110px">
+        <template slot-scope="{row}">
+          <span>{{ row.tempEntrada + row.unidadTemp}}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="Temperatura Salida" align="center" min-width="110px">
+        <template slot-scope="{row}">
+          <span>{{ row.tempSalida + row.unidadTemp}}</span>
+        </template>
+      </el-table-column>
+
       <el-table-column label="Volumen Gas" align="center" min-width="80px">
         <template slot-scope="{row}">
           <span>{{ row.volGas + row.unidadVolumen}}</span>
@@ -78,30 +102,6 @@
       <el-table-column label="Humedad Aire" align="center" min-width="85px">
         <template slot-scope="{row}">
           <span>{{ row.humedadAire + row.unidadHumedad}}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="Temperatura Entrada" align="center" min-width="110px">
-        <template slot-scope="{row}">
-          <span>{{ row.tempEntrada + row.unidadTemp}}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="Temperatura Salida" align="center" min-width="110px">
-        <template slot-scope="{row}">
-          <span>{{ row.tempSalida + row.unidadTemp}}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="Presión Entrada" align="center" min-width="85px">
-        <template slot-scope="{row}">
-          <span>{{ row.presionEntrada + row.unidadPresion}}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="Presión Salida" align="center" min-width="80px">
-        <template slot-scope="{row}">
-          <span>{{ row.presionSalida + row.unidadPresion}}</span>
         </template>
       </el-table-column>
 
@@ -313,14 +313,12 @@ export default {
         limit: this.listQuery.limit,
         id: parseInt(this.ingresoID)
       }).then(response => {
-        console.log(response.data[2].length);
         if(response.data[2].length >= 2){
           this.grafica = false;
         }
         else{
           this.grafica = true;
         }
-        
         this.list = response.data[2]
         this.total = response.data[1]
       }).catch(err => console.log(err))

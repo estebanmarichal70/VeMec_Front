@@ -83,6 +83,7 @@ export default {
           padding: [5, 10]
         },
         yAxis: {
+          offset: -23,
           axisTick: {
             show: false
           }

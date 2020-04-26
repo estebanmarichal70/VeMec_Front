@@ -32,20 +32,8 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-      <el-table-column
-        label="ID"
-        prop="id"
-        sortable="custom"
-        align="center"
-        width="75"
-        :class-name="getSortClass('id')"
-      >
-        <template slot-scope="{row}">
-          <span>{{ row.id }}</span>
-        </template>
-      </el-table-column>
 
-      <el-table-column label="Presión Máxima" align="center" min-width="80px">
+      <el-table-column label="Presión Máxima" align="center" min-width="75px">
         <template slot-scope="{row}">
           <span>{{ row.presionMaxima + row.unidadPresion}}</span>
         </template>
@@ -539,13 +527,13 @@ export default {
     handleDownload() {
       this.downloadLoading = true
         import('@/vendor/Export2Excel').then(excel => {
-          const tHeader = ['Id', 'Presion Maxima', 'Presion Minima', 'Presion Entrada', 'Presion Salida', 'Frecuencia Gas','Volumen Gas', 'Temperatura Entrada', 'Temperatura Salida', 'Mezcla', 'Humedad Aire']
-          const filterVal = ['id', 'Presion Maxima', 'Presion Minima', 'Presion Entrada', 'Presion Salida', 'Frecuencia Gas','Volumen Gas', 'Temperatura Entrada', 'Temperatura Salida', 'Mezcla', 'Humedad Aire']
+          const tHeader = ['Id', 'Presion Maxima', 'Presion Minima', 'Presion Entrada', 'Presion Salida', 'Temperatura Entrada', 'Temperatura Salida','Volumen Gas', 'Frecuencia Gas', 'Mezcla', 'Humedad Aire', 'Fecha']
+          const filterVal = ['id', 'presionMaxima', 'presionMinima', 'presionEntrada', 'presionSalida', 'tempEntrada', 'tempSalida', 'volGas', 'frecGas', 'mezcla', 'humedadAire', 'time']
           const data = this.formatJson(filterVal)
           excel.export_json_to_excel({
             header: tHeader,
             data,
-            filename: 'Centros'
+            filename: 'Reportes'
           })
           this.downloadLoading = false
         })

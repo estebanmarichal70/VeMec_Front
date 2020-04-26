@@ -1,20 +1,20 @@
 <template>
-  <div class="app-container">
-    <div v-if="user">
+  <div class="app-container" >
+    <div v-if="user" v-loading="listLoading">
       <el-row :gutter="20">
 
         <el-col :span="6" :xs="24">
-          <user-card v-if="paciente" :paciente="paciente" />
+          <user-card v-if="pase" :paciente="paciente" />
         </el-col>
 
         <el-col :span="18" :xs="24">
-          <el-card>
+          <el-card >
             <el-tabs v-model="activeTab">
               <el-tab-pane label="Actividad" name="actividad">
-                <activity v-if="paciente" :ingresos="ingresos" :salas="salas" :paciente="paciente"/>
+                <activity v-if="pase" :salas="salas" :paciente="paciente"/>
               </el-tab-pane>
               <el-tab-pane label="Ingresos" name="ingresos">
-                <Ingresos v-if="paciente" :paciente="paciente" :salas="salas" />
+                <Ingresos v-if="pase" :paciente="paciente" :salas="salas" />
               </el-tab-pane>
             </el-tabs>
           </el-card>
@@ -37,17 +37,15 @@ export default {
   data() {
     return {
       user: {},
+      listLoading: true,
+      pase: false,
       activeTab: 'actividad',
       paciente: null,
-      ingresos: null,
       salas: [],
       listQuery: {
           page: 1,
           limit: 10,
-          paciente: null,
-          nombre: '',
-          apellido: '',
-          edad: null
+          paciente: null
         }
     }
   },
@@ -57,8 +55,7 @@ export default {
       'roles'
     ])
   },
-  mounted() {
-    console.log("index")
+  created() {
     this.listQuery.paciente = this.$route.params.id
     this.getPaciente();
   },
@@ -74,17 +71,16 @@ export default {
             id: '',
             idP: parseInt(this.paciente.id)
           }).then(res => {
-            this.ingresos = res.data[2];
+            this.paciente.ingresos = res.data[2];
             this.getSalas();
           }).catch(err => console.log(err))
       }).catch(err => console.log(err))
-      this.listLoading = false
+    
     },
     parseFecha(unix_timestamp, formato){
       return convertirFecha(unix_timestamp, formato);
     },
     async getSalas(){
-      this.listLoading = true;
       for(let index in this.paciente.ingresos){
         await vemecServices.services.salaIngreso(this.paciente.ingresos[index].id)
         .then(response => {
@@ -93,6 +89,7 @@ export default {
         .catch(err => console.log(err))
       }
       this.listLoading = false
+      this.pase = true;
     }
   }
 }

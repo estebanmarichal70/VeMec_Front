@@ -1,90 +1,175 @@
 /** |----------------------|
-    |  PRECARGA DE DATOS   |
-    |----------------------|
-    | node index.js        |
-    |----------------------|
-**/
+ |  PRECARGA DE DATOS   |
+ |----------------------|
+ | node index.js        |
+ |----------------------|
+ **/
 
 "use strict";
 
 var datos = require("./data");
 
-var vemecServices = require("../api/vemecServices");
+const baseUrl = 'http://localhost:8080'
+const basePath = '/api/v1'
+const apiUrl = baseUrl + basePath
+const axios = require('axios');
 
-let sobrecargaCentros = () => {
+let username = "admin";
+let password = "admin";
 
-  datos.centros.forEach(value => {
-    vemecServices.services.createCentro(value)
-      .then(response => {
-        console.log(`Se agrego el centro ${value.nombre}`)
+async function register() {
+  await axios.post(apiUrl + "/auth/sign_up", {
+    username,
+    password
+  })
+    .then(response => {
+      console.log("registrado");
     }).catch(err => console.log(err))
-  });
+}
 
+
+async function sobrecargaCentros() {
+
+  let auth = {};
+
+  await axios.post(apiUrl + "/auth/sign_in", {
+    username,
+    password
+  })
+    .then(response => {
+      auth["token"] = response.data.token;
+    }).catch(err => console.log(err))
+
+  axios.defaults.headers.common['Authorization'] = "Bearer " + auth.token;
+  for (let index in datos.centros) {
+    await axios.post(apiUrl + "/centro", datos.centros[index])
+      .then(response => {
+        console.log(`Se agrego el centro ${datos.centros[index].nombre}`)
+      }).catch(err => console.log(err))
+  }
 };
 
+async function sobrecargaSalas() {
 
-let sobrecargaSalas = () => {
+  let auth = {};
 
-  datos.salas.forEach(value => {
-    vemecServices.services.createSala(value)
+  await axios.post(apiUrl + "/auth/sign_in", {
+    username,
+    password
+  })
+    .then(response => {
+      auth["token"] = response.data.token;
+    }).catch(err => console.log(err))
+
+
+  axios.defaults.headers.common['Authorization'] = "Bearer " + auth.token;
+  for (let index in datos.salas) {
+    await axios.post(apiUrl + "/sala", datos.salas[index])
       .then(response => {
-        console.log(`Se agrego la sala ${value.nombre}`)
+        console.log(`Se agrego la sala ${datos.salas[index].nombre}`)
       }).catch(err => console.log(err))
-  });
+  }
+  ;
 
 }
 
-let sobrecargaVemecs = () => {
+async function sobrecargaVemecs() {
 
-  datos.vemecs.forEach(value => {
-    vemecServices.services.createVemec(value)
+  let auth = {};
+
+  await axios.post(apiUrl + "/auth/sign_in", {
+    username,
+    password
+  })
+    .then(response => {
+      auth["token"] = response.data.token;
+    }).catch(err => console.log(err))
+
+  axios.defaults.headers.common['Authorization'] = "Bearer " + auth.token;
+  for (let index in datos.vemecs) {
+    await axios.post(apiUrl + "/vemec", datos.vemecs[index])
       .then(response => {
-        console.log(`Se agrego el vemec ${value.nombre}`)
+        console.log(`Se agrego el vemec ${datos.vemecs[index].marca}`)
       }).catch(err => console.log(err))
-  });
+  }
+  ;
 
 }
 
-let sobrecargaPacientes = () => {
+async function sobrecargaPacientes() {
 
-  datos.pacientes.forEach(value => {
-    vemecServices.services.createPaciente(value)
+  let auth = {};
+
+  await axios.post(apiUrl + "/auth/sign_in", {
+    username,
+    password
+  })
+    .then(response => {
+      auth["token"] = response.data.token;
+    }).catch(err => console.log(err))
+
+  axios.defaults.headers.common['Authorization'] = "Bearer " + auth.token;
+  for (let index in datos.pacientes) {
+    await axios.post(apiUrl + "/paciente", datos.pacientes[index])
       .then(response => {
-        console.log(`Se agrego el paciente ${value.id}`)
+        console.log(`Se agrego el paciente ${datos.pacientes[index].id}`)
       }).catch(err => console.log(err))
-  });
+  }
+  ;
 
 }
 
-let sobrecargaIngresos = () => {
+async function sobrecargaIngresos() {
 
-  datos.ingresos.forEach(value => {
-    vemecServices.services.createIngreso(value)
+  let auth = {};
+
+  await axios.post(apiUrl + "/auth/sign_in", {
+    username,
+    password
+  })
+    .then(response => {
+      auth["token"] = response.data.token;
+    }).catch(err => console.log(err))
+
+  axios.defaults.headers.common['Authorization'] = "Bearer " + auth.token;
+  for (let index in datos.ingresos) {
+    await axios.post(apiUrl + "/ingreso", datos.ingresos[index])
       .then(response => {
-        console.log(`Se agrego el ingreso ${value.causa}`)
+        console.log(`Se agrego el ingreso ${datos.ingresos[index].causa}`)
       }).catch(err => console.log(err))
-  });
+  }
+  ;
 
 }
 
-let sobrecargaReporte = () => {
+async function sobrecargaReportes() {
+  let auth = {};
 
-  datos.reporte_1.forEach(value => {
-    vemecServices.services.createReporte(value)
+  await axios.post(apiUrl + "/auth/sign_in", {
+    username,
+    password
+  })
+    .then(response => {
+      auth["token"] = response.data.token;
+    }).catch(err => console.log(err))
+
+  axios.defaults.headers.common['Authorization'] = "Bearer " + auth.token;
+  for (let index in datos.reportes) {
+    await axios.post(apiUrl + "/reporte", datos.reportes[index])
       .then(response => {
         console.log(`Se agrego el reporte`)
       }).catch(err => console.log(err))
-  });
-
-  datos.reporte_2.forEach(value => {
-    vemecServices.services.createReporte(value)
-      .then(response => {
-        console.log(`Se agrego el reporte`)
-      }).catch(err => console.log(err))
-  });
-
+  }
 }
 
+async function cargarDatos(){
+  //await register();
+  //await sobrecargaCentros();
+  //await sobrecargaSalas();
+  //await sobrecargaVemecs();
+  //await sobrecargaPacientes();
+  //await sobrecargaIngresos();
+  await sobrecargaReportes();
+}
 
-
-sobrecargaReporte();
+cargarDatos();

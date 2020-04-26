@@ -1,12 +1,9 @@
 var centros = require("./Centros.json");
-
 var salas = require("./Salas.json");
 var vemecs = require("./Vemecs.json");
 var pacientes = require("./Pacientes.json");
-var ingresos = require("./Ingreso.json");
-
-var reporte_1 = require("./Reporte.json");
-var reporte_2 = require("./Reporte_2.json");
+var ingresos = require("./Ingresos.json");
+var reportes = require("./Reportes.json");
 
 let datos = {
   centros,
@@ -14,8 +11,7 @@ let datos = {
   vemecs,
   pacientes,
   ingresos,
-  reporte_1,
-  reporte_2
+  reportes
 }
 
 module.exports = datos;

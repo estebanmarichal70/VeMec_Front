@@ -32,20 +32,8 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-      <el-table-column
-        label="ID"
-        prop="id"
-        sortable="custom"
-        align="center"
-        width="75"
-        :class-name="getSortClass('id')"
-      >
-        <template slot-scope="{row}">
-          <span>{{ row.id }}</span>
-        </template>
-      </el-table-column>
 
-      <el-table-column label="Presión Máxima" align="center" min-width="80px">
+      <el-table-column label="Presión Máxima" align="center" min-width="75px">
         <template slot-scope="{row}">
           <span>{{ row.presionMaxima + row.unidadPresion}}</span>
         </template>

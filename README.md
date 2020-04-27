@@ -14,6 +14,8 @@ Se debe tener node js instalado previamente en el sistema, verificar con:
     node -v
     npm -v
 ```
+Se debe verificar la ruta de la api en la carpeta src/api/vemecServices.js.
+
 Para levantar la app en el servidor de webpack ejecutar:
 
 ```

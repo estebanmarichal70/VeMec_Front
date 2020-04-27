@@ -163,12 +163,12 @@ async function sobrecargaReportes() {
 }
 
 async function cargarDatos(){
-  //await register();
-  //await sobrecargaCentros();
-  //await sobrecargaSalas();
-  //await sobrecargaVemecs();
-  //await sobrecargaPacientes();
-  //await sobrecargaIngresos();
+  await register();
+  await sobrecargaCentros();
+  await sobrecargaSalas();
+  await sobrecargaVemecs();
+  await sobrecargaPacientes();
+  await sobrecargaIngresos();
   await sobrecargaReportes();
 }
 

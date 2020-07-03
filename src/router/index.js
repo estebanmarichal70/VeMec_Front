@@ -102,6 +102,19 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/emergencia',
+    component: Layout,
+    redirect: 'noRedirect',
+    children: [
+      {
+        path: '/emergencia',
+        component: () => import('@/views/sala/sala'),
+        name: 'Sala',
+        meta: { title: 'Emergencia', icon: 'international', affix: true,requiresAuth: true },
+      }
+    ]
+  },
+  {
     path: '/reporte',
     component: Layout,
     redirect: 'noRedirect',

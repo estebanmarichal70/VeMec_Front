@@ -162,6 +162,10 @@ module.exports = {
     contarPacientes(){
       addDefaultHeaders();
       return axios.get(apiUrl + "/ingreso/total");
+    },
+    getNombresCentros(){
+      addDefaultHeaders()
+      return axios.get(apiUrl + "/centro/id_nombre")
     }
   }
 }

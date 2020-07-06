@@ -56,6 +56,11 @@
       <el-table-column label="VeMecs" align="center" min-width="130px">
         <template slot-scope="{row}">
           <el-button slot="reference" size="mini" type="success" @click="getVemecs(row), dialogMainVemec = true" >Ver VeMecs</el-button>
+          <router-link :to="`/monitoreo/${row.id}`">
+            <el-button size="mini" type="danger">
+              Monitorear Urgencias
+            </el-button>
+          </router-link>
         </template>
       </el-table-column>
       <el-table-column label="Acciones" align="center" min-width="230px">

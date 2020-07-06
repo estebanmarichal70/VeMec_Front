@@ -1,10 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-
-Vue.use(Router)
-
 /* Layout */
 import Layout from '@/layout'
+
+Vue.use(Router)
 
 export const constantRoutes = [
   {
@@ -43,7 +42,7 @@ export const constantRoutes = [
         path: 'inicio',
         component: () => import('@/views/dashboard/index'),
         name: 'Inicio',
-        meta: { requiresAuth: true},
+        meta: {requiresAuth: true},
       }
     ]
   },
@@ -56,7 +55,7 @@ export const constantRoutes = [
         path: '/centro',
         component: () => import('@/views/centro/centro'),
         name: 'Centro',
-        meta: { title: 'Centros', icon: 'hospital', affix: true, requiresAuth: true},
+        meta: {title: 'Centros', icon: 'hospital', affix: true, requiresAuth: true},
       }
     ]
   },
@@ -70,7 +69,7 @@ export const constantRoutes = [
         path: '/sala/:id',
         component: () => import('@/views/sala/sala'),
         name: 'Sala',
-        meta: { title: 'Sala', icon: 'international', affix: true,requiresAuth: true },
+        meta: {title: 'Sala', icon: 'international', affix: true, requiresAuth: true},
       }
     ]
   },
@@ -83,7 +82,7 @@ export const constantRoutes = [
         path: '/paciente',
         component: () => import('@/views/paciente/paciente'),
         name: 'Paciente',
-        meta: { title: 'Pacientes', icon: 'i-registration', affix: true, requiresAuth: true },
+        meta: {title: 'Pacientes', icon: 'i-registration', affix: true, requiresAuth: true},
       }
     ]
   },
@@ -97,20 +96,21 @@ export const constantRoutes = [
         path: '/perfil/:id',
         component: () => import('@/views/perfilPaciente/index'),
         name: 'Perfil',
-        meta: { title: 'Perfil', icon: 'person', affix: true, requiresAuth: true },
+        meta: {title: 'Perfil', icon: 'person', affix: true, requiresAuth: true},
       }
     ]
   },
   {
-    path: '/emergencia',
+    path: '/monitoreo',
     component: Layout,
     redirect: 'noRedirect',
+    hidden: true,
     children: [
       {
-        path: '/emergencia',
-        component: () => import('@/views/sala/sala'),
-        name: 'Sala',
-        meta: { title: 'Emergencia', icon: 'international', affix: true,requiresAuth: true },
+        path: '/monitoreo/:id',
+        component: () => import('@/views/monitoreo/Monitoreo'),
+        name: 'Monitoreo',
+        meta: {title: 'Monitoreo', icon: 'monitor-de-uci', affix: true, requiresAuth: true},
       }
     ]
   },
@@ -124,15 +124,15 @@ export const constantRoutes = [
         path: '/reporte/:id',
         component: () => import('@/views/reporte/reporte'),
         name: 'Reporte',
-        meta: { title: 'Reportes', icon: 'dashboard', affix: true, requiresAuth: true }
+        meta: {title: 'Reportes', icon: 'dashboard', affix: true, requiresAuth: true}
       }
     ]
   },
-  { path: '*', redirect: '/404', hidden: true }
+  {path: '*', redirect: '/404', hidden: true}
 ]
 
 const createRouter = () => new Router({
-  scrollBehavior: () => ({ y: 0 }),
+  scrollBehavior: () => ({y: 0}),
   mode: 'history',
   routes: constantRoutes
 })
@@ -140,35 +140,33 @@ const createRouter = () => new Router({
 const router = createRouter()
 
 router.beforeEach((to, from, next) => {
-  if(to.matched.some(record => {
+  if (to.matched.some(record => {
     return record.meta.requiresAuth
   })) {
     if (localStorage.getItem('access_token') == null || localStorage.getItem('access_token') == "null") {
       next({
         path: '/login',
-        params: { nextUrl: to.fullPath }
+        params: {nextUrl: to.fullPath}
       })
     } else {
       let user = JSON.parse(localStorage.getItem('user'))
-      if(to.matched.some(record => record.meta.is_admin)) {
-        if(user.is_admin == 1){
+      if (to.matched.some(record => record.meta.is_admin)) {
+        if (user.is_admin == 1) {
           next()
+        } else {
+          next({name: 'userboard'})
         }
-        else{
-          next({ name: 'userboard'})
-        }
-      }else {
+      } else {
         next()
       }
     }
-  } else if(to.matched.some(record => record.meta.guest)) {
-    if(localStorage.getItem('jwt') == null){
+  } else if (to.matched.some(record => record.meta.guest)) {
+    if (localStorage.getItem('jwt') == null) {
       next()
+    } else {
+      next({name: 'userboard'})
     }
-    else{
-      next({ name: 'userboard'})
-    }
-  }else {
+  } else {
     next()
   }
 })

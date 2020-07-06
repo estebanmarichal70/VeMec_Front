@@ -7,7 +7,7 @@
       <el-select @change="handleFilter()" v-model="listQuery.codigo" placeholder="Código" clearable class="filter-item" style="width: 130px">
         <el-option v-for="item in codigos" :key="item.key" :label="item.key" :value="item.key"/>
       </el-select>
-      
+
       <el-button class="filter-item" type="primary" icon="el-icon-edit" @click="handleCreate">
         Añadir
       </el-button>
@@ -81,7 +81,7 @@
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             Actualizar
           </el-button>
-          
+
           <el-popconfirm
             confirmButtonText='Si, eliminar'
             confirmButtonType='danger'
@@ -94,7 +94,7 @@
           >
             <el-button size="mini" type="danger" slot="reference">Eliminar</el-button>
           </el-popconfirm>
-          
+
         </template>
       </el-table-column>
     </el-table>

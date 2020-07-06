@@ -7,6 +7,25 @@
  */
 import moment from 'moment'
 
+
+
+export function convertirFechaParaGrafica(unix_timestamp, formato) {
+  moment.locale('es', {
+    longDateFormat: {
+      LT: "DD/MM/YYYY[\n]h:mm:ss A",
+      L: "MM/DD/YYYY",
+      l: "M/D/YYYY",
+      LL: "MMMM Do YYYY",
+      ll: "MMM D YYYY",
+      LLL: "MMMM Do YYYY LT",
+      lll: "MMM D YYYY LT",
+      LLLL: "dddd, MMMM Do YYYY LT",
+      llll: "ddd, MMM D YYYY LT"
+    }
+  });
+  return moment(unix_timestamp).format(formato);
+}
+
 export function convertirFecha(unix_timestamp, formato){
   moment.locale('es');
   return moment(unix_timestamp).format(formato);

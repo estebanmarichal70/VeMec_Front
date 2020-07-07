@@ -12,7 +12,7 @@
       <vs-col style="margin-top: 16px" v-else v-for="paciente in pacientes" v-bind:key="paciente.reporte.cedula"
               vs-type="flex"
               vs-justify="center" vs-align="center" vs-w="12">
-        <vs-card>
+        <vs-card :class="`${paciente.reporte.bateria ? 'fondo' : null }`">
           <vs-row style="margin-top: 4px">
             <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="6">
               <line-chart :chart-data="paciente.lineChartData"/>
@@ -155,6 +155,33 @@
                         </vs-col>
                       </vs-row>
                       <vs-divider></vs-divider>
+                      <vs-row vs-type="flex" class="text-header" vs-justify="center">
+                        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="6">
+                          <span>Usando Bateria</span>
+                        </vs-col>
+                        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="6">
+                          <span>Nivel de Bateria</span>
+                        </vs-col>
+                      </vs-row>
+                      <vs-row class="text-important">
+                        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="6">
+                          {{paciente.reporte.bateria ? 'SI' : 'NO'}}
+                        </vs-col>
+                        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="6">
+                          {{paciente.reporte.bateria ? paciente.reporte.nivelBateria + "%" : '--'}}
+                        </vs-col>
+                      </vs-row>
+                      <vs-divider id="divider"></vs-divider>
+                      <vs-row  vs-type="flex" class="text-header" vs-justify="center" vs-align="center">
+                        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="12">
+                          <router-link :to="`/perfil/${paciente.person.id}`">
+                            <el-button size="lg" type="primary">
+                              Historial del Paciente
+                            </el-button>
+                          </router-link>
+                        </vs-col>
+                      </vs-row>
+                      <vs-divider></vs-divider>
                     </vs-row>
                   </vs-col>
                 </vs-row>
@@ -261,6 +288,7 @@
             let mensaje = JSON.parse(val.body);
 
             if (parseInt(this.$route.params.id) === mensaje.sala.id) {
+              console.log(mensaje);
               this.modifyChart(mensaje)
             }
           });
@@ -326,4 +354,13 @@
   .title-healthy {
     color: #5a5e66;
   }
+
+  .fondo{
+    background: #edfa38;
+  }
+
+  #divider{
+    margin-bottom: 15px !important;
+  }
+  
 </style>

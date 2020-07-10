@@ -53,36 +53,7 @@
           <p>Sin patologias</p>
         </div>
       </div>
-      <el-button class="filter-item" type="primary" icon="el-icon-edit" @click="handleCreate">
-        Añadir
-      </el-button>
     </div>
-
-    <el-dialog :title="textMap[dialogStatus]" center width="40%" :visible.sync="dialogFormVisible">
-      <!--<el-form
-        ref="dataForm"
-        :rules="rules"
-        :model="sala"
-        label-position="top"
-        style="width: 80%; margin-left: 40px"
-      >
-        <el-form-item label="Nombre" prop="nombre">
-          <el-input v-model="sala.nombre" />
-        </el-form-item>
-        <el-form-item label="Capacidad" prop="capacidad">
-          <el-input-number v-model="sala.capacidad" :min="1" :max="99"></el-input-number>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">
-          Cancelar
-        </el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
-          Confirmar
-        </el-button>
-      </div>-->
-    </el-dialog>
-
   </el-card>
 </template>
 

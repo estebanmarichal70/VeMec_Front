@@ -29,7 +29,12 @@
             <el-button type="primary" @click="toggleDiagnosticsDialog()" plain>
               Añadir diagnostico.
             </el-button>
-            <dialog-diagnostico :dialog-form-visible.sync="dialogFormVisible"></dialog-diagnostico>
+            <router-link :to="{ name: 'Diagnosticos', params: { ingreso: item }}">
+              <el-button type="info" plain>
+                Ver diagnosticos
+              </el-button>
+            </router-link>
+            <dialog-diagnostico :ingreso="item.id" :dialog-form-visible.sync="dialogFormVisible"></dialog-diagnostico>
           </el-card>
         </el-timeline-item>
       </el-timeline>

@@ -122,7 +122,7 @@ module.exports = {
       addDefaultHeaders();
       return axios.get(apiUrl + `/ingreso/${id}`)
     },
-    getCountAllByEstado(){
+    getCountAllByEstado() {
       return axios.get(apiUrl + `/ingreso/cnt_by_estado`)
     },
     // Acciones Reportes
@@ -147,25 +147,28 @@ module.exports = {
       addDefaultHeaders();
       return axios.get(apiUrl + "/paciente/cnt_by_sexo");
     },
-    contarPacientesPorEdad(){
+    contarPacientesPorEdad() {
       addDefaultHeaders();
       return axios.get(apiUrl + "/paciente/cnt_by_edad");
     },
-    contarVemecs(){
+    contarVemecs() {
       addDefaultHeaders();
       return axios.get(apiUrl + "/vemec/cnt_by_estado");
     },
-    contarIngresosHoy(){
+    contarIngresosHoy() {
       addDefaultHeaders();
       return axios.get(apiUrl + "/ingreso/ingresos_hoy");
     },
-    contarPacientes(){
+    contarPacientes() {
       addDefaultHeaders();
       return axios.get(apiUrl + "/ingreso/total");
     },
-    getNombresCentros(){
+    getNombresCentros() {
       addDefaultHeaders()
       return axios.get(apiUrl + "/centro/id_nombre")
+    },
+    createNewDiagnostico(data) {
+      return axios.post(apiUrl + "/diagnosticos", data);
     }
   }
 }

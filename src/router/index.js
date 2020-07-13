@@ -115,6 +115,22 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/diagnosticos',
+    component: Layout,
+    redirect: 'noRedirect',
+    hidden: true,
+    props: true,
+    children: [
+      {
+        path: '/diagnosticos',
+        component: () => import('@/views/VerDiagnosticos/DiagnosticosPdf'),
+        name: 'Diagnosticos',
+        props: true,
+        meta: {title: 'Diagnosticos', icon: 'monitor-de-uci', affix: true, requiresAuth: true},
+      }
+    ]
+  },
+  {
     path: '/reporte',
     component: Layout,
     redirect: 'noRedirect',

@@ -2,6 +2,11 @@
   <div class="app-container">
     <vs-row vs-justify="center">
 
+      <vue-plyr ref="alert-player" style="display: none">
+        <audio>
+          <source src="@/assets/audio/alerta.mp3" type="audio/mp3"/>
+        </audio>
+      </vue-plyr>
       <vs-col style="margin-top: 16px; flex-direction: column;" vs-type="flex" v-if="pacientes.length <= 0"
               vs-justify="center" vs-align="center"
               vs-w="8">
@@ -172,7 +177,7 @@
                         </vs-col>
                       </vs-row>
                       <vs-divider id="divider"></vs-divider>
-                      <vs-row  vs-type="flex" class="text-header" vs-justify="center" vs-align="center">
+                      <vs-row vs-type="flex" class="text-header" vs-justify="center" vs-align="center">
                         <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="12">
                           <router-link :to="`/perfil/${paciente.person.id}`">
                             <el-button size="lg" type="primary">
@@ -200,16 +205,19 @@
   import {Stomp} from "@stomp/stompjs";
   import {convertirFechaParaGrafica} from '@/utils'
   import LineChart from "@/components/Charts/LinePpmChart/LineChart";
+  import VuePlyr from 'vue-plyr'
 
   let stompClient = null;
   export default {
     name: "Monitoreo.vue",
     components: {
-      LineChart
+      LineChart,
+      VuePlyr
     },
     data() {
       return {
         pacientes: [],
+        stompClient: null,
         lineChartData: {
           ppm: [],
           fechas: []
@@ -217,9 +225,12 @@
       }
     },
     methods: {
+      playMusic() {
+
+      },
       modifyChart(mensaje) {
         if (this.pacientes.length <= 0) {
-
+          this.$refs['alert-player'].player.play();
           let fecha = this.parseFecha(mensaje.reporte.time, 'LT');
 
           let reporte = {
@@ -248,7 +259,6 @@
           let paciente = this.pacientes.findIndex((paciente) => paciente.reporte.cedula === reporte.cedula)
 
           if (paciente !== -1) {
-
             if (this.pacientes[paciente].lineChartData.ppm.length >= 20) {
               this.pacientes[paciente].lineChartData.ppm.shift();
               this.pacientes[paciente].lineChartData.fechas.shift();
@@ -260,6 +270,7 @@
             this.pacientes[paciente].reporte = reporte;
 
           } else {
+            this.$refs['alert-player'].player.play();
             let fecha = this.parseFecha(reporte.time, 'LT');
             let paciente = {
               lineChartData: {
@@ -282,9 +293,9 @@
       this.lineChartData.ppm = [];
       this.$nextTick(() => {
         let socket = new SockJS("http://localhost:8080/alertas-api");
-        stompClient = Stomp.over(socket);
-        stompClient.connect({}, frame => {
-          stompClient.subscribe("/alertas/reportes", val => {
+        this.stompClient = Stomp.over(socket);
+        this.stompClient.connect({}, frame => {
+          this.stompClient.subscribe("/alertas/reportes", val => {
             let mensaje = JSON.parse(val.body);
 
             if (parseInt(this.$route.params.id) === mensaje.sala.id) {
@@ -294,6 +305,9 @@
           });
         });
       });
+    },
+    beforeDestroy() {
+      this.stompClient.disconnect();
     }
   }
 </script>
@@ -355,12 +369,12 @@
     color: #5a5e66;
   }
 
-  .fondo{
+  .fondo {
     background: #edfa38;
   }
 
-  #divider{
+  #divider {
     margin-bottom: 15px !important;
   }
-  
+
 </style>

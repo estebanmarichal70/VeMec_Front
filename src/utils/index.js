@@ -26,6 +26,7 @@ export function convertirFechaParaGrafica(unix_timestamp, formato) {
   return moment(unix_timestamp).format(formato);
 }
 
+
 export function convertirFecha(unix_timestamp, formato){
   moment.locale('es');
   return moment(unix_timestamp).format(formato);

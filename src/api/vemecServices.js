@@ -169,6 +169,9 @@ module.exports = {
     },
     createNewDiagnostico(data) {
       return axios.post(apiUrl + "/diagnosticos", data);
+    },
+    getAllDiagnosticosByIngreso(idIngreso) {
+      return axios.get(apiUrl + `/diagnosticos/${idIngreso}`)
     }
   }
 }

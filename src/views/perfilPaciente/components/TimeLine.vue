@@ -19,22 +19,30 @@
             </el-badge>
             <p><strong>Vemec: </strong>{{ item.vemec.id }}</p>
             <p v-if="salas[index]"><strong>Sala: </strong>{{salas[index].nombre}}</p>
-            <p><strong>Fecha de alta: </strong><span
-              v-if="item.fechaEgreso">{{parseFecha(item.fechaEgreso,'LLLL')}}</span><span v-else> Internado </span></p>
+            <p>
+              <strong>Fecha de alta: </strong><span
+              v-if="item.fechaEgreso">{{parseFecha(item.fechaEgreso,'LLLL')}}</span>
+              <span v-else> Internado </span>
+            </p>
+
             <router-link :to="`/reporte/${item.id}`">
               <el-button type="info" plain>
                 Reportes
               </el-button>
             </router-link>
+
             <el-button type="primary" @click="toggleDiagnosticsDialog()" plain>
               Añadir diagnostico.
             </el-button>
-            <router-link :to="{ name: 'Diagnosticos', params: { ingreso: item }}">
+
+            <router-link :to="{ name: 'Diagnosticos', params: { ingreso: item, paciente }}">
               <el-button type="info" plain>
                 Ver diagnosticos
               </el-button>
             </router-link>
+
             <dialog-diagnostico :ingreso="item.id" :dialog-form-visible.sync="dialogFormVisible"></dialog-diagnostico>
+
           </el-card>
         </el-timeline-item>
       </el-timeline>

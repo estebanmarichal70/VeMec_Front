@@ -93,9 +93,6 @@
         this.$emit('update:dialogFormVisible', this.dialogOpened)
       }
     },
-    mounted() {
-      console.log(this.ingreso)
-    },
     methods: {
       createDiagnostic() {
 
@@ -108,7 +105,6 @@
           riesgo: this.riesgo,
           ingreso: this.ingreso
         }
-
 
 
         if (this.cargo === "Médico") data['medico'] = this.nombreTratante

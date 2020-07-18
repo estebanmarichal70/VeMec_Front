@@ -113,8 +113,30 @@
         console.log(data)
 
         VemecServices.services.createNewDiagnostico(data)
-          .then(res => console.log(res))
-          .catch(err => console.log(err))
+          .then(res => {
+          this.resetDiagnostic();
+          this.$notify({
+              title: 'Éxito',
+              message: 'Se creó el diagnóstico correctamente',
+              type: 'success',
+              duration: 3000
+            })
+          })
+          .catch(err => this.$notify({
+              title: 'Error',
+              message: 'Ocurrió un error al crear diagnóstico',
+              type: 'error',
+              duration: 3000
+            }))
+      },
+      resetDiagnostic(){
+        this.dialogOpened = false
+        this.cargo = 'Médico'
+        this.fecha = ''
+        this.nombreTratante = ''
+        this.descripcion = ''
+        this.riesgo = ''
+        this.medicacion = ''
       }
     }
   }

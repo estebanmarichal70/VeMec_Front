@@ -14,10 +14,13 @@
         <img src="../../assets/img/healthy.png" alt="Imagen de saludable"/>
       </vs-col>
 
-      <vs-col style="margin-top: 16px" v-else v-for="paciente in pacientes" v-bind:key="paciente.reporte.cedula"
+      <vs-col style="margin-top: 16px" v-else v-for="(paciente, index) in pacientes"
+              v-bind:key="index"
               vs-type="flex"
-              vs-justify="center" vs-align="center" vs-w="12">
-        <vs-card :class="`${paciente.reporte.bateria ? 'fondo' : null }`">
+              vs-justify="center" vs-align="center" vs-w="12"
+      >
+        <vs-card v-if="((page*2-1<=index && index <= page*2) && (index !== 0))"
+                 :class="`${paciente.reporte.bateria ? 'fondo' : null }`">
           <vs-row style="margin-top: 4px">
             <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="6">
               <line-chart :chart-data="paciente.lineChartData"/>
@@ -197,6 +200,17 @@
         </vs-card>
       </vs-col>
     </vs-row>
+    <vs-row>
+      <vs-col>
+        <el-pagination
+          v-show="pacientes.length > 0"
+          layout="prev, pager, next"
+          :page-count="numberOfPages"
+          :current-page.sync="page"
+        >
+        </el-pagination>
+      </vs-col>
+    </vs-row>
   </div>
 </template>
 
@@ -222,12 +236,15 @@
           ppm: [],
           fechas: []
         },
+        page: 1
+      }
+    },
+    computed: {
+      numberOfPages() {
+        return Math.ceil((this.pacientes.length - 1) / 2);
       }
     },
     methods: {
-      playMusic() {
-
-      },
       modifyChart(mensaje) {
         if (this.pacientes.length <= 0) {
           this.$refs['alert-player'].player.play();
@@ -247,8 +264,7 @@
             person: mensaje.paciente
           }
 
-          this.pacientes.push(paciente);
-
+          this.pacientes[1] = (paciente);
         } else {
 
           let reporte = {
@@ -256,7 +272,12 @@
             cedula: mensaje.paciente.id
           }
 
-          let paciente = this.pacientes.findIndex((paciente) => paciente.reporte.cedula === reporte.cedula)
+          let paciente = this.pacientes.findIndex((paciente, index) => {
+            if (index !== 0)
+              return paciente.reporte.cedula === reporte.cedula
+            else
+              return false;
+          })
 
           if (paciente !== -1) {
             if (this.pacientes[paciente].lineChartData.ppm.length >= 20) {

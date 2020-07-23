@@ -21,7 +21,9 @@ import Vuesax from 'vuesax'
 
 import 'vuesax/dist/vuesax.css' //Vuesax styles
 
+
 Vue.use(Vuesax)
+
 
 Vue.use(Element, {
   size: Cookies.get('size') || 'medium', // set element-ui default size,
